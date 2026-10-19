@@ -1,4 +1,4 @@
-// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads shared/prayers.js and this script:
+// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads this script:
 //   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done and <key>-best)
 //   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js), heroPos (CSS background-position)
 //   about        array of HTML paragraphs shown at the top of Study
@@ -334,7 +334,7 @@ const MODES={
 let onKey=null;
 document.addEventListener("keydown",e=>{if(onKey)onKey(e);});
 
-// Next button under each exercise: the next step, or from Recite the next prayer in Most Common order (shared/prayers.js).
+// Next button under each exercise: the next step, or from Recite back to the home page.
 // A tab can take over the button for steps within itself by setting nextAction={label, fn} and calling drawNext.
 const TAB_NAMES={study:"Study",fade:"Fade",cues:"Initials",order:"Next line",recall:"Recite"};
 let nextAction=null;
@@ -351,8 +351,7 @@ function drawNext(m){
     document.getElementById("nextstep").onclick=()=>{go(STEPS[k+1]);scrollToEl(document.getElementById("tabs"));};
     return;
   }
-  const list=[...(window.PRAYERS||[])].sort((a,b)=>a.priority-b.priority),i=list.findIndex(p=>p.key===P.key),nx=i>=0?list[i+1]:null;
-  el.innerHTML=nx?`<a class="btn primary" href="../${esc(nx.href)}">Next prayer: ${esc(nx.title)} →</a>`:`<a class="btn primary" href="../index.html">All prayers →</a>`;
+  el.innerHTML=`<a class="btn primary" href="../index.html">Next: All prayers →</a>`;
 }
 function go(m){mode=m;store.set("mode",m);onKey=null;nextAction=null;
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));
