@@ -1,4 +1,4 @@
-# Catholic Study
+# Catholic Prayer Study
 
 A small static site for studying Catholic concepts and memorizing prayers.
 
