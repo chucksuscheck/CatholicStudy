@@ -1,5 +1,5 @@
-// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads shared/review.js and this script:
-//   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done, <key>-best and <key>-review)
+// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads this script:
+//   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done and <key>-best)
 //   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js), heroPos (CSS background-position)
 //   about        array of HTML paragraphs shown at the top of Study
 //   placeholder  hint text for the Recite box
@@ -19,10 +19,8 @@ const RANGE=[];{let c=0;MOVES.forEach(m=>{const n=m.lines.join(" ").split(/\s+/)
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 
 const store={get(k,d){try{const v=localStorage.getItem(P.key+"-"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-             set(k,v){try{localStorage.setItem(P.key+"-"+k,JSON.stringify(v))}catch(e){}},
-             raw(k){try{return localStorage.getItem(k)}catch(e){return null}}}; // unprefixed, unparsed (e.g. "debug-today")
+             set(k,v){try{localStorage.setItem(P.key+"-"+k,JSON.stringify(v))}catch(e){}}};
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-const today=()=>Review.today(store.raw("debug-today"));
 
 document.title=P.title;
 document.body.innerHTML=`<div class="wrap">
@@ -38,7 +36,6 @@ document.body.innerHTML=`<div class="wrap">
     <cite class="credit">Zünd, The Road to Emmaus, 1877</cite>
   </a></header>
   <div class="path"><span id="pathlabel">0 of 5 steps</span><div class="bar"><div class="fill" id="pathfill" style="width:0"></div></div></div>
-  <div class="review" id="review" role="status"></div>
   <nav role="tablist" id="tabs">
     <button role="tab" data-m="study"><b>1</b>Study</button>
     <button role="tab" data-m="fade"><b>2</b>Fade</button>
@@ -66,15 +63,6 @@ const view=document.getElementById("view");
 
 // Progress: one badge per exercise, kept in localStorage alongside the rest.
 let done=store.get("done",{});
-// Review schedule: a separate layer on top of the five badges (see shared/review.js).
-let review=Review.clean(store.get("review",null));
-{const m=Review.migrate(review,STEPS.every(s=>done[s]),today());if(m!==review){review=m;store.set("review",review);}}
-function drawReview(){
-  const s=Review.status(review,today()),el=document.getElementById("review");
-  el.className="review "+s.state;
-  el.innerHTML=`<span>${esc(s.text)}</span>${s.state==="due"?`<button class="btn primary" id="reviewnow">Review now</button>`:""}`;
-  if(s.state==="due")document.getElementById("reviewnow").onclick=()=>{go("recall");document.getElementById("recall").focus();};
-}
 function drawProgress(){
   const n=STEPS.filter(s=>done[s]).length;
   document.getElementById("pathlabel").textContent=n===5?"All 5 steps complete":`${n} of 5 steps`;
@@ -96,9 +84,7 @@ function complete(step){
   if(done[step])return;
   done[step]=true;store.set("done",done);drawProgress();burst();
   const n=STEPS.filter(s=>done[s]).length;
-  const first=n===5&&!review;
-  if(first){review=Review.start(today());store.set("review",review);drawReview();}
-  toast(n===5?`<b>✦</b> All five steps complete.${first?" First review: tomorrow.":""}`:`<b>✓</b> Step ${STEPS.indexOf(step)+1} complete · ${n} of 5`);
+  toast(n===5?`<b>✦</b> All five steps complete. It's now in Review on the home page.`:`<b>✓</b> Step ${STEPS.indexOf(step)+1} complete · ${n} of 5`);
 }
 
 function prayerHTML(fn,a=0,b=WORDS.length){ // fn(word,globalIndex) -> html; only lines starting in [a,b) are shown
@@ -246,7 +232,7 @@ const MODES={
   start();
  },
  // Recite. Long prayers (3+ movements) offer a scope: Whole prayer (scored exactly as before), Build up (movements I..k)
- // or One section. Only Whole prayer updates best, completes the recall step and counts as a review; the others are practice.
+ // or One section. Only Whole prayer updates best and completes the recall step; the others are practice.
  // Every check, in any scope, updates per-movement scores (<key>-sections) and the missed-word list Fade hides first (<key>-missed).
  recall(){
   const SCOPED=MOVES.length>=3,last=MOVES.length-1;
@@ -276,10 +262,9 @@ const MODES={
       .map(([v,t])=>`<button type="button" data-scope="${v}" aria-pressed="${sc.mode===v}">${t}</button>`).join("")}</div>
      ${sc.mode==="build"?`<select id="buildk" aria-label="Movements to recite">${MOVES.map((_,k)=>`<option value="${k}"${k===sc.k?" selected":""}>${esc(buildLabel(k))}</option>`).join("")}</select>`:""}
      ${sc.mode==="one"?`<select id="onesec" aria-label="Section to recite">${MOVES.map((m,k)=>`<option value="${k}"${k===sc.sec?" selected":""}>${ROMAN[k]} · ${esc(m.name)}</option>`).join("")}</select>`:""}</div>
-    ${whole()?"":`<p class="scope-note">Practice only: doesn't change your best score, step progress or reviews.</p>`}</div>
+    ${whole()?"":`<p class="scope-note">Practice only: doesn't change your best score or step progress.</p>`}</div>
    <div class="weak" id="weak" hidden></div>`:""}
    <p class="hint">${whole()?"Type the whole prayer from memory.":sc.mode==="build"?`Type movements ${esc(buildLabel(sc.k).split(" · ")[0])} from memory.`:`Type section ${ROMAN[sc.sec]} from memory.`} Spelling of each word counts; punctuation and capitals don't.${whole()?" Score 90% or more to complete this step.":""}</p>
-   ${whole()&&Review.isDue(review,today())?`<p class="rvnote due">This attempt counts as today's review.</p>`:""}
    ${after?`<p class="after"><span>Comes after:</span>${pm.vr?`<span class="mark">℟</span>`:""}${esc(after)}</p>`:""}
    <textarea id="recall" placeholder="${esc(sc.mode==="one"&&sc.sec>0?"Type this section…":P.placeholder)}" spellcheck="false" autocapitalize="sentences"></textarea>
    <div class="row"><button class="btn primary" id="check">Check my recitation</button><button class="btn" id="clear">Clear</button></div>
@@ -320,18 +305,9 @@ const MODES={
     return;
    }
    const prev=store.get("best",0);if(pct>prev)store.set("best",pct);
-   // On or after the due date this attempt is the review; before it, it's practice and the schedule stays put.
-   const t=today();let note="";
-   if(Review.isDue(review,t)){
-    review=Review.record(review,pct,t);store.set("review",review);drawReview();
-    const dn=view.querySelector(".rvnote.due");if(dn)dn.remove();
-    note=pct>=Review.PASS?`Review passed. ${Review.nextText(review,t)}.`:`Below ${Review.PASS}%, so this prayer comes back tomorrow for another review.`;
-    toast(`<b>${pct>=Review.PASS?"✓":"↻"}</b> ${esc(note)}`);
-   }else if(review)note=`Practice attempt. Your review schedule doesn't change. ${Review.status(review,t).text}.`;
    document.getElementById("result").innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:10px">
     <div class="score"><span class="big">${pct}%</span><span>${got} of ${n} words${extra?` · ${extra} extra`:""}</span>
      <span class="best">${pct>prev?"New best":"Best: "+Math.max(prev,pct)+"%"}</span></div>
-    ${note?`<p class="rvnote">${esc(note)}</p>`:""}
     <p class="legend"><span class="r-ok">Green</span> words you had. <span class="r-miss">Red</span> words you missed or changed.</p>
     <div class="prayer">${prayerHTML((w,k)=>`<span class="${hit[k]?"r-ok":"r-miss"}">${esc(w)}</span>`).replace('class="card prayer"','')}</div></div>`;
    if(pct>=90)complete("recall");
@@ -349,7 +325,6 @@ function go(m){mode=m;store.set("mode",m);onKey=null;
   MODES[m]();}
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.m));
 drawProgress();
-drawReview();
-// "#recite" (from the home page's Due today list) opens straight to Recite.
+// "#recite" (from the home page's Review list) opens straight to Recite.
 go(location.hash==="#recite"?"recall":MODES[mode]?mode:"study");
 })();

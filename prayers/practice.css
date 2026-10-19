@@ -57,14 +57,6 @@ a.hero:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .path .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold-bright));border-radius:3px;transition:width .5s}
 @media (prefers-reduced-motion:reduce){.path .fill{transition:none}}
 
-/* Review status, one line under the progress bar */
-.review{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin-top:-10px;font-size:14px;color:var(--muted)}
-.review.due{margin-top:-6px;color:var(--ink);font-weight:500;background:var(--gold-soft);border:1px solid var(--gold);border-radius:10px;padding:6px 6px 6px 12px}
-.review.due span::before{content:"●";color:var(--gold);margin-right:7px;font-size:11px;vertical-align:2px}
-.review .btn{padding:8px 14px;font-size:14px}
-.rvnote{margin:0;font-size:14.5px;color:var(--ink);background:var(--accent-soft);border-radius:8px;padding:8px 12px}
-.rvnote.due{background:var(--gold-soft);border:1px solid var(--gold)}
-
 nav{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
 nav button{position:relative;font:500 13px/1.2 var(--sans);border:0;background:transparent;color:var(--muted);padding:9px 2px;border-radius:9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
 nav button b{font:600 15px var(--serif);color:inherit}

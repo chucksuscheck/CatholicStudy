@@ -72,18 +72,15 @@ a.feature:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .pips{display:flex;gap:4px}
 .pips i{width:18px;height:6px;border-radius:3px;background:var(--line)}
 .pips i.on{background:var(--gold-bright)}
-.rv{margin-top:6px;font-size:13.5px;color:var(--muted)}
-.rv.due{color:var(--gold);font-weight:700}
-
-/* Due today: reviews waiting, most overdue first */
-.due-list{display:flex;flex-direction:column;gap:8px}
-a.due-item{display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px;background:var(--gold-soft);border:1px solid var(--gold);border-radius:12px;
+/* Review: every prayer you've finished all five steps for, lowest best recital first */
+.review-list{display:flex;flex-direction:column;gap:8px}
+a.review-item{display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
   padding:12px 14px;color:var(--ink);text-decoration:none}
-a.due-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-a.due-item .t{flex:1;min-width:150px;font:500 18px/1.3 var(--serif)}
-a.due-item .s{font-size:13.5px;font-weight:700;color:var(--gold)}
-a.due-item .go{font:600 14px var(--sans);color:var(--accent)}
-@media (hover:hover){a.due-item:hover{border-color:var(--accent)}}
+a.review-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+a.review-item .t{flex:1;min-width:150px;font:500 18px/1.3 var(--serif)}
+a.review-item .s{font-size:13.5px;color:var(--muted)}
+a.review-item .go{font:600 14px var(--sans);color:var(--accent)}
+@media (hover:hover){a.review-item:hover{border-color:var(--gold)}}
 .quiet{margin:0;font-size:14px;color:var(--muted)}
 
 
@@ -105,7 +102,7 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
     <figcaption><span class="sub">Memorize common prayers in a few minutes a day.</span><cite>Robert Zünd, The Road to Emmaus, 1877</cite></figcaption>
   </figure>
 
-  <section id="duesec" aria-live="polite"></section>
+  <section id="reviewsec"></section>
 
   <section>
     <div class="sec-h"><h2>Prayers</h2>
@@ -120,7 +117,6 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
   <footer><span>Progress is saved in your browser on this device.</span><span>✦ Ora pro nobis</span></footer>
 </div>
 <script src="shared/emblems.js"></script>
-<script src="shared/review.js"></script>
 <script>
 // One card per prayer page. priority ranks them by how often you’ll use them; why is shown in Priority view. key matches the page's localStorage prefix, so each card can show saved progress.
 const PRAYERS=[
@@ -136,49 +132,37 @@ const PRAYERS=[
 ];
 const list=document.getElementById("prayers");
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-             set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
-             raw(k){try{return localStorage.getItem(k)}catch(e){return null}},   // unparsed strings ("home-sort", "debug-today")
+             raw(k){try{return localStorage.getItem(k)}catch(e){return null}},   // unparsed strings ("home-sort")
              setRaw(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const STEPS=["study","fade","cues","order","recall"];
-const TODAY=Review.today(store.raw("debug-today"));
-// Saved progress per prayer. Learners who finished all five steps before reviews existed get a review due today.
+// Saved progress per prayer.
 const STATE={};
-PRAYERS.forEach(p=>{
-  const done=store.get(p.key+"-done",{})||{};let review=Review.clean(store.get(p.key+"-review",null));
-  const m=Review.migrate(review,STEPS.every(s=>done[s]),TODAY);if(m!==review){review=m;store.set(p.key+"-review",review);}
-  STATE[p.key]={done,best:store.get(p.key+"-best",null),review,status:Review.status(review,TODAY)};
-});
+PRAYERS.forEach(p=>{STATE[p.key]={done:store.get(p.key+"-done",{})||{},best:store.get(p.key+"-best",null)};});
 // priority = how often you’ll use them; alpha ignores a leading "The".
 const SORTS={priority:(a,b)=>a.priority-b.priority,
              alpha:(a,b)=>a.title.replace(/^The /,"").localeCompare(b.title.replace(/^The /,""))};
 let sort=store.raw("home-sort")||"priority";
 if(!SORTS[sort])sort="priority";
 function card(p){
-  const {done,best,status}=STATE[p.key];
+  const {done,best}=STATE[p.key];
   const n=STEPS.filter(s=>done[s]).length;
   const txt=(n===5?"All 5 steps ✦":n?`${n} of 5 steps`:"Not started")+(best!=null?` · best recital ${best}%`:"");
   const a=document.createElement("a");a.className="feature";a.href=p.href;
   a.innerHTML=`<div class="badge">${sort==="priority"?`<span class="rank" aria-label="Most common: number ${p.priority}">${p.priority}</span>`:""}<svg width="54" height="54" viewBox="-50 -50 100 100" aria-hidden="true"></svg></div>
     <div style="min-width:0"><div class="t">${esc(p.title)}</div><div class="d"><i>${esc(p.latin)}</i> · ${esc(sort==="priority"?p.why:p.d)}</div>
-    <div class="prog"><div class="pips">${[0,1,2,3,4].map(i=>`<i class="${i<n?"on":""}"></i>`).join("")}</div><span>${esc(txt)}</span></div>
-    <div class="rv ${status.state}">${esc(status.text)}</div></div>`;
+    <div class="prog"><div class="pips">${[0,1,2,3,4].map(i=>`<i class="${i<n?"on":""}"></i>`).join("")}</div><span>${esc(txt)}</span></div></div>`;
   window.drawEmblem(a.querySelector("svg"),p.emblem);
   return a;
 }
-// Due today: due and overdue prayers, most overdue first. If none, one quiet line with the next review.
-function renderDue(){
-  const sec=document.getElementById("duesec");
-  const due=PRAYERS.filter(p=>STATE[p.key].status.state==="due")
-    .sort((a,b)=>STATE[b.key].status.overdue-STATE[a.key].status.overdue||a.priority-b.priority);
-  if(due.length){
-    sec.innerHTML=`<div class="sec-h"><h2>Due today</h2></div><div class="due-list">${due.map(p=>`<a class="due-item" href="${p.href}#recite">
-      <span class="t">${esc(p.title)}</span><span class="s">${esc(STATE[p.key].status.text)}</span><span class="go">Review →</span></a>`).join("")}</div>`;
-    return;
-  }
-  const next=PRAYERS.filter(p=>STATE[p.key].review).sort((a,b)=>Review.daysBetween(STATE[b.key].review.due,STATE[a.key].review.due))[0];
-  sec.innerHTML=`<p class="quiet">${next?`Nothing due today. Next review: ${esc(next.title)}, ${esc(Review.label(STATE[next.key].review.due,TODAY))}.`
-    :"Nothing due today. Reviews start once you finish all five steps of a prayer."}</p>`;
+// Review: prayers with all five steps done, lowest best recital first, each opening straight to Recite.
+function renderReview(){
+  const sec=document.getElementById("reviewsec");
+  const learned=PRAYERS.filter(p=>STEPS.every(s=>STATE[p.key].done[s]))
+    .sort((a,b)=>(STATE[a.key].best??0)-(STATE[b.key].best??0)||a.priority-b.priority);
+  sec.innerHTML=`<div class="sec-h"><h2>Review</h2></div>${learned.length?`<div class="review-list">${learned.map(p=>`<a class="review-item" href="${p.href}#recite">
+      <span class="t">${esc(p.title)}</span>${STATE[p.key].best!=null?`<span class="s">Best recital ${STATE[p.key].best}%</span>`:""}<span class="go">Recite →</span></a>`).join("")}</div>`
+    :`<p class="quiet">Prayers appear here once you finish all five steps, so you can come back and recite them.</p>`}`;
 }
 function render(){
   list.replaceChildren(...[...PRAYERS].sort(SORTS[sort]).map(card));
@@ -187,7 +171,7 @@ function render(){
 }
 document.querySelectorAll(".sort button").forEach(b=>b.onclick=()=>{
   sort=b.dataset.sort;store.setRaw("home-sort",sort);render();});
-renderDue();
+renderReview();
 render();
 </script>
 </body>
