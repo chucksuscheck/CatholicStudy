@@ -94,7 +94,7 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
   <section>
     <div class="sec-h"><h2>Prayers</h2>
       <div class="sort" role="group" aria-label="Sort prayers">
-        <button type="button" data-sort="priority">Priority</button><button type="button" data-sort="alpha">A–Z</button>
+        <button type="button" data-sort="priority">Most Common</button><button type="button" data-sort="alpha">A–Z</button>
       </div>
     </div>
     <p class="note" id="sortnote">Ranked by how often you’ll use them. Learn 1, 2, 3, 5, 6 and 8 and you can pray the full Rosary from memory.</p>
@@ -130,7 +130,7 @@ function card(p){
   const n=["study","fade","cues","order","recall"].filter(s=>done[s]).length;
   const txt=(n===5?"Memorized ✦":n?`${n} of 5 steps`:"Not started")+(best!=null?` · best recital ${best}%`:"");
   const a=document.createElement("a");a.className="feature";a.href=p.href;
-  a.innerHTML=`<div class="badge">${sort==="priority"?`<span class="rank" aria-label="Priority ${p.priority}">${p.priority}</span>`:""}<svg width="54" height="54" viewBox="-50 -50 100 100" aria-hidden="true"></svg></div>
+  a.innerHTML=`<div class="badge">${sort==="priority"?`<span class="rank" aria-label="Most common: number ${p.priority}">${p.priority}</span>`:""}<svg width="54" height="54" viewBox="-50 -50 100 100" aria-hidden="true"></svg></div>
     <div style="min-width:0"><div class="t">${p.title}</div><div class="d"><i>${p.latin}</i> · ${sort==="priority"?p.why:p.d}</div>
     <div class="prog"><div class="pips">${[0,1,2,3,4].map(i=>`<i class="${i<n?"on":""}"></i>`).join("")}</div><span>${txt}</span></div></div>`;
   window.drawEmblem(a.querySelector("svg"),p.emblem);
