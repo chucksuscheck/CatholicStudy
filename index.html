@@ -50,7 +50,7 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,48px);lin
 .sec-h h2{margin:0;font:700 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 .sec-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
 .sort{order:1;display:flex;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
-.sort button{font:600 13px var(--sans);border:0;background:transparent;color:var(--muted);padding:6px 12px;border-radius:7px;cursor:pointer}
+.sort button{font:600 13px var(--sans);border:0;background:transparent;color:var(--muted);padding:10px 12px;border-radius:7px;cursor:pointer}
 .sort button[aria-pressed="true"]{background:var(--accent);color:var(--card)}
 .sort button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .badge{position:relative}
@@ -62,12 +62,13 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,48px);lin
 .list{display:flex;flex-direction:column;gap:10px}
 a.feature{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);
   border-radius:16px;padding:16px;color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s,box-shadow .15s}
-a.feature:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(31,43,18,.14)}
+@media (hover:hover){a.feature:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(31,43,18,.14)}}
 a.feature:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .badge{width:72px;height:72px;border-radius:14px;background:radial-gradient(circle at 50% 35%,#5C7A36,var(--accent-deep));display:grid;place-items:center}
 .feature .t{font:500 22px/1.2 var(--serif);color:var(--accent)}
 .feature .d{font-size:14.5px;color:var(--muted);margin-top:2px}
-.prog{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted)}
+.prog{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:10px;font-size:13px;color:var(--muted)}
+@media (max-width:420px){a.feature{gap:12px;padding:14px}.badge{width:56px;height:56px}.badge svg{width:44px;height:44px}.feature .t{font-size:20px}}
 .pips{display:flex;gap:4px}
 .pips i{width:18px;height:6px;border-radius:3px;background:var(--line)}
 .pips i.on{background:var(--gold-bright)}
