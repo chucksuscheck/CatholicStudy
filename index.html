@@ -63,12 +63,6 @@ a.feature:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .pips i{width:18px;height:6px;border-radius:3px;background:var(--line)}
 .pips i.on{background:var(--gold-bright)}
 
-.soon{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.tile{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
-.tile .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:18px}
-.tile .t{font:500 16.5px/1.25 var(--serif)}
-.tile .d{font-size:13px;color:var(--muted)}
-.tile .tag{font:700 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
 
 footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 </style>
@@ -91,15 +85,6 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
   <section>
     <div class="sec-h"><h2>Prayers</h2></div>
     <div class="list" id="prayers"></div>
-  </section>
-
-  <section>
-    <div class="sec-h"><h2>Coming soon</h2></div>
-    <div class="soon">
-      <div class="tile"><span class="tag">Prayer</span><div class="ic">❦</div><div class="t">The Hail Mary</div><div class="d">“Hail Mary, full of grace…”</div></div>
-      <div class="tile"><span class="tag">Concept</span><div class="ic">✧</div><div class="t">The Seven Sacraments</div><div class="d">Signs instituted by Christ</div></div>
-      <div class="tile"><span class="tag">Concept</span><div class="ic">❖</div><div class="t">Virtues</div><div class="d">Three theological, four cardinal</div></div>
-    </div>
   </section>
 
   <footer><span>Progress is saved in your browser on this device.</span><span>✦ Ora pro nobis</span></footer>
