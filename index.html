@@ -6,42 +6,45 @@
 <title>Catholic Study</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap">
 <style>
-/* Home page: same palette and type as the exercise pages. A rose-window hero, then exercise cards. Add new exercises to the lists below. */
+/* Home page: palette drawn from Robert Zünd's "The Road to Emmaus" (1877) — forest greens, ochre road, golden light, robe red.
+   The painting is the hero; exercise cards follow. Add new exercises to the lists below. */
 :root{
-  --bg:#F3F5FA; --card:#FFFFFF; --ink:#18213B; --muted:#5D6785; --line:#D9DEEB;
-  --marian:#2C4C98; --marian-deep:#1B2F66; --marian-soft:#E3E9F7; --gold:#9C7A25; --gold-bright:#D4AF4A; --gold-soft:#F6EFD9;
-  --glass-blue:#3D63C9; --glass-red:#B03A48; --glass-green:#3F8A6B;
+  --bg:#F4EFE1; --card:#FFFDF6; --ink:#262A18; --muted:#666449; --line:#DDD5BC;
+  --accent:#3F5A26; --accent-deep:#1F2B12; --accent-soft:#E6EAD3; --gold:#94681E; --gold-bright:#E3BC6A; --gold-soft:#F5E9CC;
+  --robe:#9E3B2A;
   --serif:"Spectral",Georgia,"Times New Roman",serif;
   --sans:"Alegreya Sans",-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0D1222; --card:#151C31; --ink:#E5E9F4; --muted:#9AA4C0; --line:#28314C;
-  --marian:#93ABEA; --marian-deep:#1A2550; --marian-soft:#1F2A4A; --gold:#D6B460; --gold-bright:#E6C46A; --gold-soft:#2E2715; color-scheme:dark}}
+  --bg:#12150C; --card:#1B1F13; --ink:#ECE6D2; --muted:#A8A487; --line:#30351F;
+  --accent:#B4C98A; --accent-deep:#1A2410; --accent-soft:#252C18; --gold:#E2B865; --gold-bright:#E9C677; --gold-soft:#2E2715;
+  --robe:#E08A72; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0D1222; --card:#151C31; --ink:#E5E9F4; --muted:#9AA4C0; --line:#28314C;
-  --marian:#93ABEA; --marian-deep:#1A2550; --marian-soft:#1F2A4A; --gold:#D6B460; --gold-bright:#E6C46A; --gold-soft:#2E2715; color-scheme:dark}
+  --bg:#12150C; --card:#1B1F13; --ink:#ECE6D2; --muted:#A8A487; --line:#30351F;
+  --accent:#B4C98A; --accent-deep:#1A2410; --accent-soft:#252C18; --gold:#E2B865; --gold-bright:#E9C677; --gold-soft:#2E2715;
+  --robe:#E08A72; color-scheme:dark}
 
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
 .wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
 
-.hero{position:relative;overflow:hidden;border-radius:20px;padding:28px 22px;color:#F4F1E6;
-  background:radial-gradient(120% 140% at 80% 0%,#3D5FB5 0%,var(--marian-deep) 50%,#0E1736 100%);
-  display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}
-.hero::before{content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(circle at 10% 110%,rgba(212,175,74,.28),transparent 50%)}
-.hero > *{position:relative}
-.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);font-weight:700}
-h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,46px);line-height:1.05;margin:6px 0 0;color:#fff}
-.sub{color:#C9D3EE;margin:8px 0 0;font-size:16px;max-width:34ch}
-.quote{margin:14px 0 0;font:italic 15px/1.45 var(--serif);color:var(--gold-bright)}
-.quote span{display:block;font:500 12px var(--sans);color:#AEB9DA;font-style:normal;margin-top:2px;letter-spacing:.04em}
-.rose{width:clamp(110px,28vw,170px);height:auto;filter:drop-shadow(0 0 18px rgba(212,175,74,.35))}
-.rose .spin{transform-origin:0 0;animation:spin 120s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media (prefers-reduced-motion:reduce){.rose .spin{animation:none}}
-@media (max-width:440px){.hero{grid-template-columns:1fr}.rose{grid-row:1;justify-self:start;width:92px}}
+.hero{margin:0;border-radius:20px;overflow:hidden;background:var(--accent-deep);box-shadow:0 10px 30px rgba(31,43,18,.18)}
+.hero .art{position:relative;aspect-ratio:640/456;max-height:440px;width:100%;
+  background:url("images/zund-road-to-emmaus.jpg") center 60%/cover no-repeat}
+.hero .art::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(20,26,10,.55) 0%,rgba(20,26,10,0) 38%,rgba(20,26,10,0) 55%,rgba(20,26,10,.85) 100%)}
+.hero .top,.hero .bottom{position:absolute;left:0;right:0;z-index:1;padding:20px 22px}
+.hero .top{top:0}
+.hero .bottom{bottom:0}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,48px);line-height:1.05;margin:4px 0 0;color:#FFF8E6;text-shadow:0 2px 12px rgba(0,0,0,.45)}
+.quote{margin:0;font:italic clamp(15px,3.6vw,18px)/1.45 var(--serif);color:#FFF4D8;max-width:44ch;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+.quote span{display:block;font:500 12.5px var(--sans);color:var(--gold-bright);font-style:normal;margin-top:4px;letter-spacing:.04em}
+.hero figcaption{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 22px 14px;color:#D9D3B8;font-size:13.5px}
+.hero figcaption .sub{color:#FFF8E6;font-size:15.5px}
+.hero figcaption cite{font-style:italic;color:#A8A487}
+@media (max-width:440px){.hero .art{aspect-ratio:4/5;background-position:62% 60%}}
 
 .sec-h{display:flex;align-items:center;gap:10px;margin:0 0 10px}
 .sec-h h2{margin:0;font:700 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
@@ -49,10 +52,10 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,46px);lin
 
 a.feature{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);
   border-radius:16px;padding:16px;color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s,box-shadow .15s}
-a.feature:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(27,47,102,.12)}
+a.feature:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(31,43,18,.14)}
 a.feature:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
-.badge{width:72px;height:72px;border-radius:14px;background:radial-gradient(circle at 50% 35%,#3D5FB5,var(--marian-deep));display:grid;place-items:center}
-.feature .t{font:500 22px/1.2 var(--serif);color:var(--marian)}
+.badge{width:72px;height:72px;border-radius:14px;background:radial-gradient(circle at 50% 35%,#5C7A36,var(--accent-deep));display:grid;place-items:center}
+.feature .t{font:500 22px/1.2 var(--serif);color:var(--accent)}
 .feature .d{font-size:14.5px;color:var(--muted);margin-top:2px}
 .prog{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:var(--muted)}
 .pips{display:flex;gap:4px}
@@ -61,7 +64,7 @@ a.feature:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 .soon{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
 .tile{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
-.tile .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--marian-soft);color:var(--marian);font-size:18px}
+.tile .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:18px}
 .tile .t{font:500 16.5px/1.25 var(--serif)}
 .tile .d{font-size:13px;color:var(--muted)}
 .tile .tag{font:700 10.5px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
@@ -71,43 +74,18 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
 </head>
 <body>
 <div class="wrap">
-  <header class="hero">
-    <div>
-      <span class="eyebrow">Ad maiorem Dei gloriam</span>
-      <h1>Catholic Study</h1>
-      <p class="sub">Memorize the prayers. Learn the faith. A few minutes a day.</p>
-      <p class="quote">“Pray constantly.”<span>1 Thessalonians 5:17</span></p>
+  <figure class="hero">
+    <div class="art">
+      <div class="top">
+        <span class="eyebrow">Ad maiorem Dei gloriam</span>
+        <h1>Catholic Study</h1>
+      </div>
+      <div class="bottom">
+        <p class="quote">“Did not our hearts burn within us while he talked to us on the road?”<span>Luke 24:32</span></p>
+      </div>
     </div>
-    <svg class="rose" viewBox="-100 -100 200 200" aria-hidden="true">
-      <defs>
-        <path id="petal" d="M0,-24 C16,-40 18,-66 0,-86 C-18,-66 -16,-40 0,-24Z"/>
-        <circle id="lobe" cy="-55" r="7"/>
-      </defs>
-      <circle r="97" fill="#0E1736" stroke="var(--gold-bright)" stroke-width="3"/>
-      <g class="spin" stroke="var(--gold-bright)" stroke-width="2">
-        <use href="#petal" fill="var(--glass-blue)"/>
-        <use href="#petal" fill="var(--glass-red)" transform="rotate(30)"/>
-        <use href="#petal" fill="var(--glass-blue)" transform="rotate(60)"/>
-        <use href="#petal" fill="var(--glass-green)" transform="rotate(90)"/>
-        <use href="#petal" fill="var(--glass-blue)" transform="rotate(120)"/>
-        <use href="#petal" fill="var(--glass-red)" transform="rotate(150)"/>
-        <use href="#petal" fill="var(--glass-blue)" transform="rotate(180)"/>
-        <use href="#petal" fill="var(--glass-green)" transform="rotate(210)"/>
-        <use href="#petal" fill="var(--glass-blue)" transform="rotate(240)"/>
-        <use href="#petal" fill="var(--glass-red)" transform="rotate(270)"/>
-        <use href="#petal" fill="var(--glass-blue)" transform="rotate(300)"/>
-        <use href="#petal" fill="var(--glass-green)" transform="rotate(330)"/>
-        <g fill="var(--gold-bright)" stroke="none">
-          <use href="#lobe" transform="rotate(15)"/><use href="#lobe" transform="rotate(45)"/><use href="#lobe" transform="rotate(75)"/>
-          <use href="#lobe" transform="rotate(105)"/><use href="#lobe" transform="rotate(135)"/><use href="#lobe" transform="rotate(165)"/>
-          <use href="#lobe" transform="rotate(195)"/><use href="#lobe" transform="rotate(225)"/><use href="#lobe" transform="rotate(255)"/>
-          <use href="#lobe" transform="rotate(285)"/><use href="#lobe" transform="rotate(315)"/><use href="#lobe" transform="rotate(345)"/>
-        </g>
-      </g>
-      <circle r="22" fill="var(--marian-deep)" stroke="var(--gold-bright)" stroke-width="2.5"/>
-      <path d="M0,-13 V13 M-9,-4 H9" stroke="var(--gold-bright)" stroke-width="3.5" stroke-linecap="round"/>
-    </svg>
-  </header>
+    <figcaption><span class="sub">Memorize the prayers. Learn the faith. A few minutes a day.</span><cite>Robert Zünd, The Road to Emmaus, 1877</cite></figcaption>
+  </figure>
 
   <section>
     <div class="sec-h"><h2>Prayers</h2></div>
