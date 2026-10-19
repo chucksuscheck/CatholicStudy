@@ -66,6 +66,7 @@ nav button[data-done="true"]::after{content:"✓";position:absolute;top:3px;righ
 button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 .hint{font-size:14.5px;color:var(--muted);margin:0}
+.aloud{margin:0;font-size:14.5px;color:var(--ink);background:var(--accent-soft);border-radius:8px;padding:8px 12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 18px}
 .prayer{font-family:var(--serif);font-size:19px;line-height:1.75;border-left:3px solid var(--gold)}
 .prayer p{margin:0 0 .6em}

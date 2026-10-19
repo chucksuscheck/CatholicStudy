@@ -168,6 +168,7 @@ const MODES={
     <div class="row"><div class="levels">${[0,1,2,3,4,5].map(n=>`<button id="lv${n}" aria-pressed="${n===lvl}" data-n="${n}">${n}</button>`).join("")}</div>
     <div class="row" style="justify-content:space-between;width:100%"><span class="lvlabel" style="width:auto">Level ${lvl}: ${labels[lvl]}</span>
      <button class="btn" id="newpat">New pattern</button></div></div>
+    ${lvl===5?`<p class="aloud">Say the whole prayer aloud from the blanks. Speaking it helps you remember it.</p>`:""}
     ${prayerHTML((w,i)=>rank[i]<cut?`<span class="w hid" data-w="${esc(w)}" data-c="${esc(w)}">${esc(w)}</span>`:esc(w))}</div>`;
    view.querySelectorAll(".hid").forEach(el=>el.onclick=()=>el.classList.toggle("peek"));
    view.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>{lvl=+b.dataset.n;draw();if(lvl===5)complete("fade");});
@@ -265,6 +266,7 @@ const MODES={
     ${whole()?"":`<p class="scope-note">Practice only: doesn't change your best score or step progress.</p>`}</div>
    <div class="weak" id="weak" hidden></div>`:""}
    <p class="hint">${whole()?"Type the whole prayer from memory.":sc.mode==="build"?`Type movements ${esc(buildLabel(sc.k).split(" · ")[0])} from memory.`:`Type section ${ROMAN[sc.sec]} from memory.`} Spelling of each word counts; punctuation and capitals don't.${whole()?" Score 90% or more to complete this step.":""}</p>
+   <p class="aloud">Say each line aloud as you type it. Speaking the words helps you remember them.</p>
    ${after?`<p class="after"><span>Comes after:</span>${pm.vr?`<span class="mark">℟</span>`:""}${esc(after)}</p>`:""}
    <textarea id="recall" placeholder="${esc(sc.mode==="one"&&sc.sec>0?"Type this section…":P.placeholder)}" spellcheck="false" autocapitalize="sentences"></textarea>
    <div class="row"><button class="btn primary" id="check">Check my recitation</button><button class="btn" id="clear">Clear</button></div>
