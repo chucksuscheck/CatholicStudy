@@ -91,14 +91,14 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
 </div>
 <script src="shared/emblems.js"></script>
 <script>
-// One card per prayer page. key matches the page's localStorage prefix, so each card can show saved progress.
+// One card per prayer page, alphabetical (ignoring "The"). key matches the page's localStorage prefix, so each card can show saved progress.
 const PRAYERS=[
- {href:"prayers/our-father.html",key:"paf",emblem:"paternoster",title:"The Our Father",latin:"Pater Noster",d:"The prayer Jesus taught us"},
+ {href:"prayers/apostles-creed.html",key:"apc",emblem:"apostles",title:"The Apostles’ Creed",latin:"Symbolum Apostolorum",d:"The faith of the Apostles"},
  {href:"prayers/glory-be.html",key:"glb",emblem:"glory",title:"Glory Be",latin:"Gloria Patri",d:"Praise to the Trinity"},
  {href:"prayers/hail-holy-queen.html",key:"hhq",emblem:"marian",title:"Hail, Holy Queen",latin:"Salve Regina",d:"The Marian antiphon that closes the Rosary"},
  {href:"prayers/memorare.html",key:"mem",emblem:"rose",title:"The Memorare",latin:"Memorare",d:"A prayer of confident trust in Mary"},
- {href:"prayers/apostles-creed.html",key:"apc",emblem:"apostles",title:"The Apostles’ Creed",latin:"Symbolum Apostolorum",d:"The faith of the Apostles"},
- {href:"prayers/nicene-creed.html",key:"nic",emblem:"nicene",title:"The Nicene Creed",latin:"Symbolum Nicænum",d:"The creed professed at Sunday Mass"}
+ {href:"prayers/nicene-creed.html",key:"nic",emblem:"nicene",title:"The Nicene Creed",latin:"Symbolum Nicænum",d:"The creed professed at Sunday Mass"},
+ {href:"prayers/our-father.html",key:"paf",emblem:"paternoster",title:"The Our Father",latin:"Pater Noster",d:"The prayer Jesus taught us"}
 ];
 const list=document.getElementById("prayers");
 PRAYERS.forEach(p=>{
