@@ -50,6 +50,7 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,48px);lin
 .sec-h h2{margin:0;font:700 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 .sec-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
 
+.list{display:flex;flex-direction:column;gap:10px}
 a.feature{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);
   border-radius:16px;padding:16px;color:var(--ink);text-decoration:none;transition:border-color .15s,transform .15s,box-shadow .15s}
 a.feature:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(31,43,18,.14)}
@@ -89,22 +90,12 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
 
   <section>
     <div class="sec-h"><h2>Prayers</h2></div>
-    <a class="feature" href="prayers/hail-holy-queen.html">
-      <div class="badge">
-        <svg width="54" height="54" viewBox="-50 -50 100 100" aria-hidden="true" id="mini"></svg>
-      </div>
-      <div style="min-width:0">
-        <div class="t">Hail, Holy Queen</div>
-        <div class="d"><i>Salve Regina</i> · five exercises, from reading to reciting it cold</div>
-        <div class="prog"><div class="pips" id="pips"><i></i><i></i><i></i><i></i><i></i></div><span id="progtext">Not started</span></div>
-      </div>
-    </a>
+    <div class="list" id="prayers"></div>
   </section>
 
   <section>
     <div class="sec-h"><h2>Coming soon</h2></div>
     <div class="soon">
-      <div class="tile"><span class="tag">Prayer</span><div class="ic">✝</div><div class="t">The Apostles’ Creed</div><div class="d">Twelve articles of faith</div></div>
       <div class="tile"><span class="tag">Prayer</span><div class="ic">❦</div><div class="t">The Memorare</div><div class="d">“Remember, O most gracious Virgin Mary…”</div></div>
       <div class="tile"><span class="tag">Concept</span><div class="ic">✧</div><div class="t">The Seven Sacraments</div><div class="d">Signs instituted by Christ</div></div>
       <div class="tile"><span class="tag">Concept</span><div class="ic">❖</div><div class="t">Virtues</div><div class="d">Three theological, four cardinal</div></div>
@@ -113,25 +104,29 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
 
   <footer><span>Progress is saved in your browser on this device.</span><span>✦ Ora pro nobis</span></footer>
 </div>
+<script src="shared/emblems.js"></script>
 <script>
-// Mini emblem for the Hail, Holy Queen card: twelve stars around an M.
-(function(){
-  const star=(cx,cy,r)=>{let d="";for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,rr=k%2?r*.42:r;
-    d+=(k?"L":"M")+(cx+rr*Math.cos(a)).toFixed(2)+","+(cy+rr*Math.sin(a)).toFixed(2);}return d+"Z";};
-  let s="";
-  for(let i=0;i<12;i++){const a=-Math.PI/2+i*Math.PI/6;s+=`<path fill="#E6C46A" d="${star(40*Math.cos(a),40*Math.sin(a),6)}"/>`;}
-  s+=`<text y="12" text-anchor="middle" font-family="Spectral,Georgia,serif" font-size="36" fill="#fff">M</text>`;
-  document.getElementById("mini").innerHTML=s;
-})();
-// Read progress saved by the prayer page (same origin, "hhq-" keys).
-(function(){
+// One card per prayer page. key matches the page's localStorage prefix, so each card can show saved progress.
+const PRAYERS=[
+ {href:"prayers/our-father.html",key:"paf",emblem:"paternoster",title:"The Our Father",latin:"Pater Noster",d:"The prayer Jesus taught us"},
+ {href:"prayers/glory-be.html",key:"glb",emblem:"glory",title:"Glory Be",latin:"Gloria Patri",d:"Praise to the Trinity"},
+ {href:"prayers/hail-holy-queen.html",key:"hhq",emblem:"marian",title:"Hail, Holy Queen",latin:"Salve Regina",d:"The Marian antiphon that closes the Rosary"},
+ {href:"prayers/apostles-creed.html",key:"apc",emblem:"apostles",title:"The Apostles’ Creed",latin:"Symbolum Apostolorum",d:"The faith of the Apostles"},
+ {href:"prayers/nicene-creed.html",key:"nic",emblem:"nicene",title:"The Nicene Creed",latin:"Symbolum Nicænum",d:"The creed professed at Sunday Mass"}
+];
+const list=document.getElementById("prayers");
+PRAYERS.forEach(p=>{
   let done={},best=null;
-  try{done=JSON.parse(localStorage.getItem("hhq-done")||"{}");best=JSON.parse(localStorage.getItem("hhq-best"));}catch(e){}
+  try{done=JSON.parse(localStorage.getItem(p.key+"-done")||"{}");best=JSON.parse(localStorage.getItem(p.key+"-best"));}catch(e){}
   const n=["study","fade","cues","order","recall"].filter(s=>done[s]).length;
-  document.querySelectorAll("#pips i").forEach((p,i)=>p.classList.toggle("on",i<n));
-  const txt=n===5?"Memorized ✦":n?`${n} of 5 steps`:"Not started";
-  document.getElementById("progtext").textContent=txt+(best!=null?` · best recital ${best}%`:"");
-})();
+  const txt=(n===5?"Memorized ✦":n?`${n} of 5 steps`:"Not started")+(best!=null?` · best recital ${best}%`:"");
+  const a=document.createElement("a");a.className="feature";a.href=p.href;
+  a.innerHTML=`<div class="badge"><svg width="54" height="54" viewBox="-50 -50 100 100" aria-hidden="true"></svg></div>
+    <div style="min-width:0"><div class="t">${p.title}</div><div class="d"><i>${p.latin}</i> · ${p.d}</div>
+    <div class="prog"><div class="pips">${[0,1,2,3,4].map(i=>`<i class="${i<n?"on":""}"></i>`).join("")}</div><span>${txt}</span></div></div>`;
+  window.drawEmblem(a.querySelector("svg"),p.emblem);
+  list.appendChild(a);
+});
 </script>
 </body>
 </html>

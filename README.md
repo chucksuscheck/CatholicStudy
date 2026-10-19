@@ -5,10 +5,12 @@ A small static site for studying Catholic concepts and memorizing prayers.
 ## Structure
 
 - `index.html` — home page listing all exercises
-- `prayers/` — prayer memorization exercises (e.g. `hail-holy-queen.html`)
+- `prayers/` — prayer memorization pages. Each page only defines `window.PRAYER` (text, Latin, hooks); `practice.js` and `practice.css` build the exercises
+- `shared/emblems.js` — gold emblems used on prayer headers and home-page cards
+- `images/` — Robert Zünd, *The Road to Emmaus* (1877), public domain via Wikimedia Commons
 - `concepts/` — concept study pages (coming soon)
 
-Each exercise is a single self-contained HTML file. To add one, drop the file in the right folder and add a link to it in `index.html`.
+To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER` data (give it a new `key`), and add it to the `PRAYERS` list in `index.html`.
 
 ## Running locally
 
@@ -18,4 +20,4 @@ Open `index.html` in a browser, or serve the folder:
 python3 -m http.server
 ```
 
-The site is published with GitHub Pages from the `main` branch.
+The site is deployed on Vercel (https://catholicstudy.vercel.app) from the `main` branch.
