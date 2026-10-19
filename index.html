@@ -49,6 +49,13 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,48px);lin
 .sec-h{display:flex;align-items:center;gap:10px;margin:0 0 10px}
 .sec-h h2{margin:0;font:700 12px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
 .sec-h::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.sort{order:1;display:flex;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.sort button{font:600 13px var(--sans);border:0;background:transparent;color:var(--muted);padding:6px 12px;border-radius:7px;cursor:pointer}
+.sort button[aria-pressed="true"]{background:var(--accent);color:var(--card)}
+.sort button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.badge{position:relative}
+.rank{position:absolute;top:-7px;left:-7px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  font:700 12px var(--sans);color:var(--accent-deep);background:var(--gold-bright);box-shadow:0 0 0 2px var(--card)}
 
 .list{display:flex;flex-direction:column;gap:10px}
 a.feature{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);
@@ -83,7 +90,11 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
   </figure>
 
   <section>
-    <div class="sec-h"><h2>Prayers</h2></div>
+    <div class="sec-h"><h2>Prayers</h2>
+      <div class="sort" role="group" aria-label="Sort prayers">
+        <button type="button" data-sort="priority">Priority</button><button type="button" data-sort="alpha">A–Z</button>
+      </div>
+    </div>
     <div class="list" id="prayers"></div>
   </section>
 
@@ -91,31 +102,44 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
 </div>
 <script src="shared/emblems.js"></script>
 <script>
-// One card per prayer page, alphabetical (ignoring "The"). key matches the page's localStorage prefix, so each card can show saved progress.
+// One card per prayer page. priority is the suggested order to learn them in. key matches the page's localStorage prefix, so each card can show saved progress.
 const PRAYERS=[
- {href:"prayers/act-of-contrition.html",key:"aoc",emblem:"keys",title:"Act of Contrition",latin:"Actus Contritionis",d:"Sorrow for sin and the resolve to change"},
- {href:"prayers/apostles-creed.html",key:"apc",emblem:"apostles",title:"The Apostles’ Creed",latin:"Symbolum Apostolorum",d:"The faith of the Apostles"},
- {href:"prayers/fatima-prayer.html",key:"fat",emblem:"fatima",title:"The Fatima Prayer",latin:"O mi Iesu",d:"Taught by Our Lady at Fatima for the Rosary"},
- {href:"prayers/glory-be.html",key:"glb",emblem:"glory",title:"Glory Be",latin:"Gloria Patri",d:"Praise to the Trinity"},
- {href:"prayers/hail-mary.html",key:"hmy",emblem:"lily",title:"Hail Mary",latin:"Ave Maria",d:"The angel’s greeting and the Church’s plea"},
- {href:"prayers/hail-holy-queen.html",key:"hhq",emblem:"marian",title:"Hail, Holy Queen",latin:"Salve Regina",d:"The Marian antiphon that closes the Rosary"},
- {href:"prayers/memorare.html",key:"mem",emblem:"rose",title:"The Memorare",latin:"Memorare",d:"A prayer of confident trust in Mary"},
- {href:"prayers/nicene-creed.html",key:"nic",emblem:"nicene",title:"The Nicene Creed",latin:"Symbolum Nicænum",d:"The creed professed at Sunday Mass"},
- {href:"prayers/our-father.html",key:"paf",emblem:"paternoster",title:"The Our Father",latin:"Pater Noster",d:"The prayer Jesus taught us"}
+ {href:"prayers/act-of-contrition.html",key:"aoc",priority:4,emblem:"keys",title:"Act of Contrition",latin:"Actus Contritionis",d:"Sorrow for sin and the resolve to change"},
+ {href:"prayers/apostles-creed.html",key:"apc",priority:5,emblem:"apostles",title:"The Apostles’ Creed",latin:"Symbolum Apostolorum",d:"The faith of the Apostles"},
+ {href:"prayers/fatima-prayer.html",key:"fat",priority:6,emblem:"fatima",title:"The Fatima Prayer",latin:"O mi Iesu",d:"Taught by Our Lady at Fatima for the Rosary"},
+ {href:"prayers/glory-be.html",key:"glb",priority:3,emblem:"glory",title:"Glory Be",latin:"Gloria Patri",d:"Praise to the Trinity"},
+ {href:"prayers/hail-mary.html",key:"hmy",priority:2,emblem:"lily",title:"Hail Mary",latin:"Ave Maria",d:"The angel’s greeting and the Church’s plea"},
+ {href:"prayers/hail-holy-queen.html",key:"hhq",priority:7,emblem:"marian",title:"Hail, Holy Queen",latin:"Salve Regina",d:"The Marian antiphon that closes the Rosary"},
+ {href:"prayers/memorare.html",key:"mem",priority:9,emblem:"rose",title:"The Memorare",latin:"Memorare",d:"A prayer of confident trust in Mary"},
+ {href:"prayers/nicene-creed.html",key:"nic",priority:8,emblem:"nicene",title:"The Nicene Creed",latin:"Symbolum Nicænum",d:"The creed professed at Sunday Mass"},
+ {href:"prayers/our-father.html",key:"paf",priority:1,emblem:"paternoster",title:"The Our Father",latin:"Pater Noster",d:"The prayer Jesus taught us"}
 ];
 const list=document.getElementById("prayers");
-PRAYERS.forEach(p=>{
+// priority = suggested order to learn them in; alpha ignores a leading "The".
+const SORTS={priority:(a,b)=>a.priority-b.priority,
+             alpha:(a,b)=>a.title.replace(/^The /,"").localeCompare(b.title.replace(/^The /,""))};
+let sort="priority";
+try{sort=localStorage.getItem("home-sort")||sort;}catch(e){}
+if(!SORTS[sort])sort="priority";
+function card(p){
   let done={},best=null;
   try{done=JSON.parse(localStorage.getItem(p.key+"-done")||"{}");best=JSON.parse(localStorage.getItem(p.key+"-best"));}catch(e){}
   const n=["study","fade","cues","order","recall"].filter(s=>done[s]).length;
   const txt=(n===5?"Memorized ✦":n?`${n} of 5 steps`:"Not started")+(best!=null?` · best recital ${best}%`:"");
   const a=document.createElement("a");a.className="feature";a.href=p.href;
-  a.innerHTML=`<div class="badge"><svg width="54" height="54" viewBox="-50 -50 100 100" aria-hidden="true"></svg></div>
+  a.innerHTML=`<div class="badge">${sort==="priority"?`<span class="rank" aria-label="Priority ${p.priority}">${p.priority}</span>`:""}<svg width="54" height="54" viewBox="-50 -50 100 100" aria-hidden="true"></svg></div>
     <div style="min-width:0"><div class="t">${p.title}</div><div class="d"><i>${p.latin}</i> · ${p.d}</div>
     <div class="prog"><div class="pips">${[0,1,2,3,4].map(i=>`<i class="${i<n?"on":""}"></i>`).join("")}</div><span>${txt}</span></div></div>`;
   window.drawEmblem(a.querySelector("svg"),p.emblem);
-  list.appendChild(a);
-});
+  return a;
+}
+function render(){
+  list.replaceChildren(...[...PRAYERS].sort(SORTS[sort]).map(card));
+  document.querySelectorAll(".sort button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.sort===sort));
+}
+document.querySelectorAll(".sort button").forEach(b=>b.onclick=()=>{
+  sort=b.dataset.sort;try{localStorage.setItem("home-sort",sort);}catch(e){}render();});
+render();
 </script>
 </body>
 </html>

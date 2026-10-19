@@ -9,7 +9,7 @@ A small static site for studying Catholic concepts and memorizing prayers.
 - `shared/emblems.js` — gold emblems used on prayer headers and home-page cards
 - `images/` — Robert Zünd, *The Road to Emmaus* (1877), public domain via Wikimedia Commons
 
-To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER` data (give it a new `key`), and add it to the `PRAYERS` list in `index.html`.
+To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER` data (give it a new `key`), and add it to the `PRAYERS` list in `index.html` with a `priority` (the suggested order to learn it in; the home page can sort by priority or A–Z).
 
 ## Running locally
 
