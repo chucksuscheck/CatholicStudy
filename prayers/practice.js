@@ -172,8 +172,12 @@ const MODES={
     ${lvl===5?`<p class="aloud">Say the whole prayer aloud from the blanks. Speaking it helps you remember it.</p>`:""}
     ${prayerHTML((w,i)=>rank[i]<cut?`<span class="w hid" data-w="${esc(w)}" data-c="${esc(w)}">${esc(w)}</span>`:esc(w))}</div>`;
    view.querySelectorAll(".hid").forEach(el=>el.onclick=()=>el.classList.toggle("peek"));
-   view.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>{lvl=+b.dataset.n;draw();if(lvl===5)complete("fade");});
+   const setLvl=n=>{lvl=n;draw();if(lvl===5)complete("fade");};
+   view.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>setLvl(+b.dataset.n));
    document.getElementById("newpat").onclick=()=>{reshuffle();draw();};
+   // Next: up one level; at level 5, on to the next step.
+   nextAction=lvl<5?{label:`Next: Level ${lvl+1}`,fn:()=>{setLvl(lvl+1);scrollToEl(view.querySelector(".levels"));}}:null;
+   drawNext("fade");
   };reshuffle();draw();
  },
  cues(){
@@ -197,6 +201,7 @@ const MODES={
   const reveal=()=>{s.shown=true;draw();};
   const mark=ok=>{const i=s.queue.shift();
     if(ok)s.got.add(i);else{s.missed.add(i);s.queue.splice(Math.min(3,s.queue.length),0,i);}
+    if(!s.queue.length){const nd=store.get("nextdone",{});nd[shuffled?"shuffled":"inorder"]=true;store.set("nextdone",nd);}
     s.shown=false;draw();if(!s.queue.length)complete("order");};
   const draw=()=>{
    const n=LINES.length,i=s.queue[0],fin=i===undefined;
@@ -224,6 +229,12 @@ const MODES={
    if($("got"))$("got").onclick=()=>mark(true);
    if($("miss"))$("miss").onclick=()=>mark(false);
    if($("again"))$("again").onclick=start;
+   // Next: the first round not yet finished (In order, then Shuffled), then Recite. If that's the round you're in, the one after it.
+   const nd=store.get("nextdone",{}),cur=shuffled?"shuffled":"inorder",ST=["inorder","shuffled","recall"];
+   let t=ST.find(x=>x==="recall"||!nd[x]);if(t===cur)t=ST[ST.indexOf(cur)+1];
+   nextAction=t==="recall"?null:{label:`Next: ${t==="inorder"?"In order":"Shuffled"}`,
+     fn:()=>{shuffled=t==="shuffled";store.set("nextmode",t);start();scrollToEl(view);}};
+   drawNext("order");
   };
   onKey=e=>{
    const t=e.target instanceof Element?e.target:document.body;
@@ -324,19 +335,26 @@ let onKey=null;
 document.addEventListener("keydown",e=>{if(onKey)onKey(e);});
 
 // Next button under each exercise: the next step, or from Recite the next prayer in Most Common order (shared/prayers.js).
+// A tab can take over the button for steps within itself by setting nextAction={label, fn} and calling drawNext.
 const TAB_NAMES={study:"Study",fade:"Fade",cues:"Initials",order:"Next line",recall:"Recite"};
+let nextAction=null;
+const scrollToEl=el=>el.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});
 function drawNext(m){
   const el=document.getElementById("nextnav"),k=STEPS.indexOf(m);
+  if(nextAction){
+    el.innerHTML=`<button class="btn primary" id="nextstep">${esc(nextAction.label)} →</button>`;
+    document.getElementById("nextstep").onclick=nextAction.fn;
+    return;
+  }
   if(k<STEPS.length-1){
     el.innerHTML=`<button class="btn primary" id="nextstep">Next step: ${esc(TAB_NAMES[STEPS[k+1]])} →</button>`;
-    document.getElementById("nextstep").onclick=()=>{go(STEPS[k+1]);
-      document.getElementById("tabs").scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});};
+    document.getElementById("nextstep").onclick=()=>{go(STEPS[k+1]);scrollToEl(document.getElementById("tabs"));};
     return;
   }
   const list=[...(window.PRAYERS||[])].sort((a,b)=>a.priority-b.priority),i=list.findIndex(p=>p.key===P.key),nx=i>=0?list[i+1]:null;
   el.innerHTML=nx?`<a class="btn primary" href="../${esc(nx.href)}">Next prayer: ${esc(nx.title)} →</a>`:`<a class="btn primary" href="../index.html">All prayers →</a>`;
 }
-function go(m){mode=m;store.set("mode",m);onKey=null;
+function go(m){mode=m;store.set("mode",m);onKey=null;nextAction=null;
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));
   MODES[m]();drawNext(m);}
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.m));
