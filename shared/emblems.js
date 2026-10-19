@@ -25,6 +25,12 @@
     rose:()=>ring((x,y,a)=>`<circle ${a} cx="${x}" cy="${y}" r="2.8" fill="${GOLD}"/>`)+halo+
       [0,72,144,216,288].map(d=>{const r=(d-90)*Math.PI/180;return `<circle cx="${(8*Math.cos(r)).toFixed(2)}" cy="${(8*Math.sin(r)).toFixed(2)}" r="8" fill="none" stroke="${LIGHT}" stroke-width="2"/>`;}).join("")+
       `<circle r="4" fill="${GOLD}"/>`,
+    // Hail Mary: the Annunciation lily.
+    lily:()=>ring((x,y,a)=>`<circle ${a} cx="${x}" cy="${y}" r="2.6" fill="none" stroke="${GOLD}" stroke-width="1.6"/>`)+halo+
+      `<g fill="none" stroke="${LIGHT}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+       <path d="M0,19V0"/><path d="M0,0C-5,-6 -5,-13 0,-18C5,-13 5,-6 0,0Z"/>
+       <path d="M0,0C-6,-2 -12,-8 -13,-14C-7,-12 -3,-8 0,0Z"/><path d="M0,0C6,-2 12,-8 13,-14C7,-12 3,-8 0,0Z"/>
+       <path d="M0,13C-4,9 -9,9 -11,11M0,13C4,9 9,9 11,11"/></g>`,
     // Our Father: the Chi-Rho, monogram of Christ who taught the prayer.
     paternoster:()=>ring((x,y,a)=>`<path ${a} fill="${GOLD}" d="M${x},${y-4}L${x+3},${y}L${x},${y+4}L${x-3},${y}Z"/>`)+halo+
       `<g fill="none" stroke="${LIGHT}" stroke-width="2.6" stroke-linecap="round"><path d="M0,-17V18"/><path d="M0,-17H4.5A6,6 0 0 1 4.5,-5H0"/><path d="M-10,-1L10,13M10,-1L-10,13"/></g>`
