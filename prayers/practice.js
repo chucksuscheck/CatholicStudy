@@ -101,18 +101,51 @@ function bindPeek(){view.querySelectorAll(".hid,.cue").forEach(el=>el.onclick=()
 const MODES={
  study(){
   let latin=store.get("latin",false);
+  // Ordering quiz: the real movement names mixed with decoys that aren't in this prayer.
+  // While it runs the movement list is hidden; finishing it completes the Study step.
+  const DECOYS=P.decoys||["Thanksgiving","A prayer for the dead","The Ten Commandments"];
+  let quiz=null; // {next, pool:[{name,real}], placed:[], msg}
+  const startQuiz=()=>{quiz={next:0,placed:[],msg:"",
+    pool:[...MOVES.map((m,i)=>({name:m.name,real:i})),...DECOYS.map(d=>({name:d,real:-1}))].sort(()=>Math.random()-.5)};draw();};
+  const quizHTML=()=>{
+   const intro=`<h3 class="qh">Test yourself: order the movements</h3>
+     <p class="hint">This prayer has <strong>${NUM} movements</strong>, but there are ${MOVES.length+DECOYS.length} cards below. Some aren't part of this prayer. Tap the ${NUM} that are, in order.</p>`;
+   if(!quiz)return `<div class="card quiz">${intro}
+     <div class="row">${done.study?`<span class="done">✓ You've put the movements in order.</span>`:""}
+      <button class="btn gold" id="qstart">${done.study?"Practice again":"Start (hides the movements)"}</button></div></div>`;
+   const fin=quiz.next===MOVES.length;
+   return `<div class="card quiz">${intro}
+     <div>${quiz.placed.length?quiz.placed.map(i=>`<p class="placed"><span class="mark">${ROMAN[i]}</span>${esc(MOVES[i].name)}</p>`).join(""):`<p class="hint">Movement I goes here.</p>`}</div>
+     ${fin?`<p class="done">${MOVES.length===2?"Both":"All "+NUM} movements in order.</p>`:`<div class="pool">${quiz.pool.map((c,k)=>c.placed?"":`<button class="chip${c.decoy?" decoy":""}" data-k="${k}"${c.decoy?" disabled":""}>${esc(c.name)}</button>`).join("")}</div>`}
+     <p class="qmsg" role="status">${quiz.msg}</p>
+     <div class="row">${fin?`<button class="btn" id="qclose">Show the movements</button><button class="btn" id="qstart">Practice again</button>`
+       :`<button class="btn" id="qstart">Start over</button><button class="btn" id="qclose">Stop and show the movements</button>`}</div></div>`;
+  };
   const draw=()=>{
    view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
     <div class="card about"><span class="ic">✦</span><div>${P.about.map(p=>`<p>${p}</p>`).join("")}</div></div>
-    <div class="row" style="justify-content:space-between"><p class="hint" style="flex:1;min-width:200px">${NUM[0].toUpperCase()+NUM.slice(1)} movements. Learn their names and hooks first; the words hang on them.</p>
+    ${quiz?"":`<div class="row" style="justify-content:space-between"><p class="hint" style="flex:1;min-width:200px">${NUM[0].toUpperCase()+NUM.slice(1)} movements. Learn their names and hooks first; the words hang on them.</p>
      <button class="btn" id="latin" aria-pressed="${latin}">${latin?"Hide Latin":"Show Latin"}</button></div>
     <div class="card">${MOVES.map((m,i)=>`<div class="mv"><div class="n">${ROMAN[i]}</div>
       <div style="min-width:0"><h3>${m.name}</h3><div class="t${m.vr?" vr":""}">${m.lines.map(esc).join("<br>")}</div>
       ${latin?`<div class="la">${m.latin.map(esc).join("<br>")}</div>`:""}</div>
-      <p class="hook">${m.hook}</p></div>`).join("")}</div>
-    <div class="row"><button class="btn gold" id="known">${done.study?`✓ You know the ${NUM} movements`:`I can name all ${NUM} movements`}</button></div></div>`;
-   document.getElementById("latin").onclick=()=>{latin=!latin;store.set("latin",latin);draw();};
-   document.getElementById("known").onclick=()=>{complete("study");draw();};
+      <p class="hook">${m.hook}</p></div>`).join("")}</div>`}
+    ${quizHTML()}</div>`;
+   const $=id=>document.getElementById(id);
+   if($("latin"))$("latin").onclick=()=>{latin=!latin;store.set("latin",latin);draw();};
+   if($("qstart"))$("qstart").onclick=startQuiz;
+   if($("qclose"))$("qclose").onclick=()=>{quiz=null;draw();};
+   view.querySelectorAll(".quiz .chip").forEach(b=>b.onclick=()=>{
+     const c=quiz.pool[+b.dataset.k];
+     if(c.real===quiz.next){c.placed=true;quiz.placed.push(c.real);quiz.next++;quiz.msg="";draw();
+       if(quiz.next===MOVES.length)complete("study");}
+     else{
+       if(c.real<0){c.decoy=true;quiz.msg=`“${esc(c.name)}” isn't part of this prayer.`;draw();
+         const d=view.querySelector(`.quiz .chip[data-k="${b.dataset.k}"]`);if(d)d.classList.add("wrong");}
+       else{quiz.msg=`Not yet: “${esc(c.name)}” comes later.`;view.querySelector(".qmsg").innerHTML=quiz.msg;
+         b.classList.remove("wrong");void b.offsetWidth;b.classList.add("wrong");}
+     }
+   });
   };draw();
  },
  fade(){
