@@ -101,6 +101,8 @@ button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px soli
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--card)}
 .btn.gold{background:var(--gold-soft);border-color:var(--gold);color:var(--ink)}
 .btn.ok{background:var(--ok);border-color:var(--ok);color:var(--card)}
+a.btn{text-decoration:none;display:inline-block}
+.nextnav{display:flex;justify-content:flex-end;margin-top:-4px}
 .levels{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;flex:1;min-width:220px}
 .levels button{font:600 14px var(--sans);border:1px solid var(--line);background:var(--card);color:var(--muted);padding:8px 0;border-radius:8px;cursor:pointer}
 .levels button[aria-pressed="true"]{background:var(--accent);color:var(--card);border-color:var(--accent)}

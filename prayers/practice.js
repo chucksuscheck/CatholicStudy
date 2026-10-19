@@ -1,4 +1,4 @@
-// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads this script:
+// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads shared/prayers.js and this script:
 //   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done and <key>-best)
 //   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js), heroPos (CSS background-position)
 //   about        array of HTML paragraphs shown at the top of Study
@@ -45,6 +45,7 @@ document.body.innerHTML=`<div class="wrap">
     <button role="tab" data-m="recall"><b>5</b>Recite</button>
   </nav>
   <main id="view"></main>
+  <div class="nextnav" id="nextnav"></div>
   <footer>
     <strong>A routine that works</strong>
     <ol>
@@ -322,9 +323,22 @@ const MODES={
 let onKey=null;
 document.addEventListener("keydown",e=>{if(onKey)onKey(e);});
 
+// Next button under each exercise: the next step, or from Recite the next prayer in Most Common order (shared/prayers.js).
+const TAB_NAMES={study:"Study",fade:"Fade",cues:"Initials",order:"Next line",recall:"Recite"};
+function drawNext(m){
+  const el=document.getElementById("nextnav"),k=STEPS.indexOf(m);
+  if(k<STEPS.length-1){
+    el.innerHTML=`<button class="btn primary" id="nextstep">Next step: ${esc(TAB_NAMES[STEPS[k+1]])} →</button>`;
+    document.getElementById("nextstep").onclick=()=>{go(STEPS[k+1]);
+      document.getElementById("tabs").scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});};
+    return;
+  }
+  const list=[...(window.PRAYERS||[])].sort((a,b)=>a.priority-b.priority),i=list.findIndex(p=>p.key===P.key),nx=i>=0?list[i+1]:null;
+  el.innerHTML=nx?`<a class="btn primary" href="../${esc(nx.href)}">Next prayer: ${esc(nx.title)} →</a>`:`<a class="btn primary" href="../index.html">All prayers →</a>`;
+}
 function go(m){mode=m;store.set("mode",m);onKey=null;
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));
-  MODES[m]();}
+  MODES[m]();drawNext(m);}
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.m));
 drawProgress();
 // "#recite" (from the home page's Review list) opens straight to Recite.

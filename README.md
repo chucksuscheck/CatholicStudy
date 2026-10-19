@@ -7,9 +7,10 @@ A small static site for studying Catholic concepts and memorizing prayers.
 - `index.html` — home page listing all exercises
 - `prayers/` — prayer memorization pages. Each page only defines `window.PRAYER` (text, Latin, hooks); `practice.js` and `practice.css` build the exercises
 - `shared/emblems.js` — gold emblems used on prayer headers and home-page cards
+- `shared/prayers.js` — the list of prayer pages in Most Common order, used by the home page and each page's "Next prayer" button
 - `images/` — Robert Zünd, *The Road to Emmaus* (1877), public domain via Wikimedia Commons
 
-To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER` data (give it a new `key`), and add it to the `PRAYERS` list in `index.html` with a `priority` and a short `why` (the home page can sort by Most Common or A–Z).
+To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER` data (give it a new `key`), and add it to `shared/prayers.js` with a `priority` and a short `why` (the home page can sort by Most Common or A–Z).
 
 ## Exercises and review
 
