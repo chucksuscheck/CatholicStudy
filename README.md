@@ -23,17 +23,15 @@ Ranked by how often you'll use them:
 
 | # | Prayer | File | Why it's here |
 |---|---|---|---|
-| 1 | Our Father | `our-father.html` | Said at every Mass and in every decade of the Rosary |
-| 2 | Hail Mary | `hail-mary.html` | 53 of the Rosary's beads, and the most-prayed Marian prayer |
-| 3 | Glory Be | `glory-be.html` | Ends every decade of the Rosary and many other prayers |
+| 1 | Our Father | `our-father.html` | Said at every Mass |
+| 2 | Hail Mary | `hail-mary.html` | The most-prayed Marian prayer |
+| 3 | Glory Be | `glory-be.html` | Ends many prayers, and every psalm in the Liturgy of the Hours |
 | 4 | Act of Contrition | `act-of-contrition.html` | Required in Confession |
-| 5 | Fatima Prayer | `fatima-prayer.html` | Said after each decade of the Rosary |
-| 6 | Apostles' Creed | `apostles-creed.html` | Opens the Rosary; it's also the baptismal creed |
+| 5 | Fatima Prayer | `fatima-prayer.html` | A short plea for mercy for ourselves and all souls |
+| 6 | Apostles' Creed | `apostles-creed.html` | The Church's ancient baptismal creed |
 | 7 | Nicene Creed | `nicene-creed.html` | Said at every Sunday Mass, but it's the longest, so learn it after the shorter prayers |
-| 8 | Hail, Holy Queen | `hail-holy-queen.html` | Closes the Rosary |
-| 9 | Memorare | `memorare.html` | A traditional devotion, not tied to the Mass or Rosary |
-
-Learn 1, 2, 3, 5, 6 and 8 and you can pray the full Rosary from memory.
+| 8 | Hail, Holy Queen | `hail-holy-queen.html` | Sung at Night Prayer for much of the year |
+| 9 | Memorare | `memorare.html` | A traditional devotion, not part of the Mass |
 
 ## Running locally
 

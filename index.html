@@ -110,7 +110,7 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
         <button type="button" data-sort="priority">Most Common</button><button type="button" data-sort="alpha">A–Z</button>
       </div>
     </div>
-    <p class="note" id="sortnote">Ranked by how often you’ll use them. Learn 1, 2, 3, 5, 6 and 8 and you can pray the full Rosary from memory.</p>
+    <p class="note" id="sortnote">Ranked by how often you’ll use them.</p>
     <div class="list" id="prayers"></div>
   </section>
 
@@ -121,14 +121,14 @@ footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padd
 // One card per prayer page. priority ranks them by how often you’ll use them; why is shown in Priority view. key matches the page's localStorage prefix, so each card can show saved progress.
 const PRAYERS=[
  {href:"prayers/act-of-contrition.html",key:"aoc",priority:4,why:"Required in Confession",emblem:"keys",title:"Act of Contrition",latin:"Actus Contritionis",d:"Sorrow for sin and the resolve to change"},
- {href:"prayers/apostles-creed.html",key:"apc",priority:6,why:"Opens the Rosary; it’s also the baptismal creed",emblem:"apostles",title:"The Apostles’ Creed",latin:"Symbolum Apostolorum",d:"The faith of the Apostles"},
- {href:"prayers/fatima-prayer.html",key:"fat",priority:5,why:"Said after each decade of the Rosary",emblem:"fatima",title:"The Fatima Prayer",latin:"O mi Iesu",d:"Taught by Our Lady at Fatima for the Rosary"},
- {href:"prayers/glory-be.html",key:"glb",priority:3,why:"Ends every decade of the Rosary and many other prayers",emblem:"glory",title:"Glory Be",latin:"Gloria Patri",d:"Praise to the Trinity"},
- {href:"prayers/hail-mary.html",key:"hmy",priority:2,why:"53 of the Rosary’s beads, and the most-prayed Marian prayer",emblem:"lily",title:"Hail Mary",latin:"Ave Maria",d:"The angel’s greeting and the Church’s plea"},
- {href:"prayers/hail-holy-queen.html",key:"hhq",priority:8,why:"Closes the Rosary",emblem:"marian",title:"Hail, Holy Queen",latin:"Salve Regina",d:"The Marian antiphon that closes the Rosary"},
- {href:"prayers/memorare.html",key:"mem",priority:9,why:"A traditional devotion, not tied to the Mass or Rosary",emblem:"rose",title:"The Memorare",latin:"Memorare",d:"A prayer of confident trust in Mary"},
+ {href:"prayers/apostles-creed.html",key:"apc",priority:6,why:"The Church’s ancient baptismal creed",emblem:"apostles",title:"The Apostles’ Creed",latin:"Symbolum Apostolorum",d:"The faith of the Apostles"},
+ {href:"prayers/fatima-prayer.html",key:"fat",priority:5,why:"A short plea for mercy for ourselves and all souls",emblem:"fatima",title:"The Fatima Prayer",latin:"O mi Iesu",d:"Taught by Our Lady at Fatima"},
+ {href:"prayers/glory-be.html",key:"glb",priority:3,why:"Ends many prayers, and every psalm in the Liturgy of the Hours",emblem:"glory",title:"Glory Be",latin:"Gloria Patri",d:"Praise to the Trinity"},
+ {href:"prayers/hail-mary.html",key:"hmy",priority:2,why:"The most-prayed Marian prayer",emblem:"lily",title:"Hail Mary",latin:"Ave Maria",d:"The angel’s greeting and the Church’s plea"},
+ {href:"prayers/hail-holy-queen.html",key:"hhq",priority:8,why:"Sung at Night Prayer for much of the year",emblem:"marian",title:"Hail, Holy Queen",latin:"Salve Regina",d:"An ancient Marian antiphon"},
+ {href:"prayers/memorare.html",key:"mem",priority:9,why:"A traditional devotion, not part of the Mass",emblem:"rose",title:"The Memorare",latin:"Memorare",d:"A prayer of confident trust in Mary"},
  {href:"prayers/nicene-creed.html",key:"nic",priority:7,why:"Said at every Sunday Mass, but it’s the longest, so learn it after the shorter prayers",emblem:"nicene",title:"The Nicene Creed",latin:"Symbolum Nicænum",d:"The creed professed at Sunday Mass"},
- {href:"prayers/our-father.html",key:"paf",priority:1,why:"Said at every Mass and in every decade of the Rosary",emblem:"paternoster",title:"The Our Father",latin:"Pater Noster",d:"The prayer Jesus taught us"}
+ {href:"prayers/our-father.html",key:"paf",priority:1,why:"Said at every Mass",emblem:"paternoster",title:"The Our Father",latin:"Pater Noster",d:"The prayer Jesus taught us"}
 ];
 const list=document.getElementById("prayers");
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
