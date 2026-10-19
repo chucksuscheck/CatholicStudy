@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hail, Holy Queen</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap">
+<style>
+/* Layout: one narrow devotional column; a mode switcher on top, the prayer card below. Marian blue with a restrained gold accent. */
+:root{
+  --bg:#F3F5FA; --card:#FFFFFF; --ink:#18213B; --muted:#5D6785; --line:#D9DEEB;
+  --marian:#2C4C98; --marian-soft:#E3E9F7; --gold:#9C7A25;
+  --ok:#2E7D4F; --ok-soft:#E1F1E7; --miss:#B23A3A; --miss-soft:#F7E2E2;
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+  --sans:"Alegreya Sans",-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0D1222; --card:#151C31; --ink:#E5E9F4; --muted:#9AA4C0; --line:#28314C;
+  --marian:#93ABEA; --marian-soft:#1F2A4A; --gold:#D6B460;
+  --ok:#6CC892; --ok-soft:#173326; --miss:#EE8B8B; --miss-soft:#3A1C22; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1222; --card:#151C31; --ink:#E5E9F4; --muted:#9AA4C0; --line:#28314C;
+  --marian:#93ABEA; --marian-soft:#1F2A4A; --gold:#D6B460;
+  --ok:#6CC892; --ok-soft:#173326; --miss:#EE8B8B; --miss-soft:#3A1C22; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{display:flex;flex-direction:column;gap:2px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(28px,7vw,38px);line-height:1.1;margin:0;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;font-size:15px}
+
+nav{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
+nav button{font:500 13px/1.2 var(--sans);border:0;background:transparent;color:var(--muted);padding:9px 2px;border-radius:9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+nav button b{font:600 15px var(--serif);color:inherit}
+nav button[aria-selected="true"]{background:var(--marian);color:var(--card)}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.hint{font-size:14.5px;color:var(--muted);margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 18px}
+.prayer{font-family:var(--serif);font-size:19px;line-height:1.75}
+.prayer p{margin:0 0 .6em}
+.prayer p:last-child{margin-bottom:0}
+.vr{font-style:italic}
+.mark{font:700 12px var(--sans);color:var(--gold);margin-right:6px;letter-spacing:.05em;font-style:normal}
+
+.mv{display:grid;grid-template-columns:34px 1fr;gap:4px 12px;padding:14px 0;border-top:1px solid var(--line)}
+.mv:first-child{border-top:0;padding-top:0}
+.mv .n{font:600 22px/1 var(--serif);color:var(--marian);padding-top:4px}
+.mv h3{margin:0;font:700 12px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.mv .t{font-family:var(--serif);font-size:18.5px;line-height:1.6;min-width:0}
+.mv .hook{grid-column:2;font-size:14.5px;color:var(--muted);margin:2px 0 0}
+.mv .hook strong{color:var(--ink);font-weight:500}
+
+.w{border-radius:4px;transition:background .15s}
+.w.hid{color:transparent;background:var(--marian-soft);border-bottom:2px solid var(--marian);cursor:pointer;user-select:none}
+.w.hid.peek{color:var(--marian);background:transparent}
+.w.cue{color:var(--marian);cursor:pointer;font-weight:600}
+.w.cue.peek{font-weight:400;color:var(--ink)}
+
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:500 15px var(--sans);border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:10px;cursor:pointer}
+.btn.primary{background:var(--marian);border-color:var(--marian);color:var(--card)}
+.levels{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;flex:1;min-width:220px}
+.levels button{font:600 14px var(--sans);border:1px solid var(--line);background:var(--card);color:var(--muted);padding:8px 0;border-radius:8px;cursor:pointer}
+.levels button[aria-pressed="true"]{background:var(--marian);color:var(--card);border-color:var(--marian)}
+.lvlabel{font-size:13px;color:var(--muted);width:100%}
+
+.pool{display:flex;flex-direction:column;gap:8px}
+.chip{font:400 16.5px/1.45 var(--serif);text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:10px 12px;border-radius:10px;cursor:pointer}
+.chip.wrong{border-color:var(--miss);background:var(--miss-soft);animation:shake .3s}
+.placed{font-family:var(--serif);font-size:17px;line-height:1.6;padding-left:12px;border-left:3px solid var(--ok);margin:0 0 6px}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.chip.wrong{animation:none}}
+
+textarea{width:100%;min-height:200px;font:17px/1.6 var(--serif);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;resize:vertical}
+.score{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.score .big{font:600 34px var(--serif);color:var(--marian);font-variant-numeric:tabular-nums}
+.score .best{font-size:14px;color:var(--muted)}
+.r-ok{color:var(--ok)}
+.r-miss{color:var(--miss);background:var(--miss-soft);border-radius:3px;text-decoration:underline wavy;text-underline-offset:3px}
+.legend{font-size:13.5px;color:var(--muted)}
+.done{font-size:15px;color:var(--ok);font-weight:500}
+.home{font-size:14px;color:var(--marian);text-decoration:none;font-weight:500;margin-bottom:-8px}
+.home:hover{text-decoration:underline}
+footer{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+footer ol{margin:6px 0 0;padding-left:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="home" href="../index.html">← All exercises</a>
+  <header>
+    <span class="eyebrow">Salve Regina · Memory practice</span>
+    <h1>Hail, Holy Queen</h1>
+    <p class="sub">Five exercises, from reading to reciting it cold.</p>
+  </header>
+
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-m="study"><b>1</b>Study</button>
+    <button role="tab" data-m="fade"><b>2</b>Fade</button>
+    <button role="tab" data-m="cues"><b>3</b>Initials</button>
+    <button role="tab" data-m="order"><b>4</b>Order</button>
+    <button role="tab" data-m="recall"><b>5</b>Recite</button>
+  </nav>
+
+  <main id="view"></main>
+
+  <footer>
+    <strong>A routine that works</strong>
+    <ol>
+      <li>Learn the five movements in Study until you can name them in order.</li>
+      <li>Fade up one level each day, reading aloud until it feels easy.</li>
+      <li>Use Initials, then Order, to check the sequence.</li>
+      <li>Recite from memory. Repeat tomorrow before anything else.</li>
+    </ol>
+  </footer>
+</div>
+
+<script>
+const MOVES=[
+ {name:"Greeting",hook:"<strong>Queen → Mother → life, sweetness, hope.</strong> Three titles, then three gifts.",
+  lines:["Hail, holy Queen, Mother of mercy,","our life, our sweetness and our hope."]},
+ {name:"Our cry",hook:"<strong>Cry, then sighs.</strong> “To you do we…” opens both lines. Children of Eve, in a valley of tears.",
+  lines:["To you do we cry, poor banished children of Eve;","to you do we send up our sighs, mourning and weeping in this valley of tears."]},
+ {name:"Our plea",hook:"<strong>Turn your eyes, then show us Jesus.</strong> Eyes toward us now; after exile, his face.",
+  lines:["Turn then, most gracious advocate, your eyes of mercy toward us,","and after this our exile, show unto us the blessed fruit of your womb, Jesus."]},
+ {name:"Final praise",hook:"<strong>C – L – S:</strong> clement, loving, sweet. Three “O”s.",
+  lines:["O clement, O loving, O sweet Virgin Mary."]},
+ {name:"Versicle & response",hook:"<strong>Pray → worthy → promises.</strong> Said as a call and answer.",
+  lines:["Pray for us, O holy Mother of God,","that we may be made worthy of the promises of Christ."],vr:true}
+];
+const LINES=MOVES.flatMap(m=>m.lines);
+const WORDS=LINES.join(" ").split(/\s+/);
+const norm=s=>s.toLowerCase().replace(/[^a-z]/g,"");
+
+const ORDER=WORDS.map((_,i)=>i).sort((a,b)=>((a*61+17)%97)-((b*61+17)%97));
+const RANK=[];ORDER.forEach((w,r)=>RANK[w]=r);
+
+const store={get(k,d){try{const v=localStorage.getItem("hhq-"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+             set(k,v){try{localStorage.setItem("hhq-"+k,JSON.stringify(v))}catch(e){}}};
+
+let mode=store.get("mode","study");
+const view=document.getElementById("view");
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+function prayerHTML(fn){
+  let i=0,out="";
+  MOVES.forEach(m=>m.lines.forEach((l,li)=>{
+    const ws=l.split(/\s+/).map(w=>fn(w,i++)).join(" ");
+    const mk=m.vr?`<span class="mark">${li===0?"℣":"℟"}</span>`:"";
+    out+=`<p class="${m.vr?"vr":""}">${mk}${ws}</p>`;
+  }));
+  return `<div class="card prayer">${out}</div>`;
+}
+function bindPeek(){view.querySelectorAll(".hid,.cue").forEach(el=>el.onclick=()=>{
+  const p=el.classList.toggle("peek");el.textContent=p?el.dataset.w:el.dataset.c;});}
+
+const MODES={
+ study(){
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
+   <p class="hint">The prayer has five movements. Learn their names and hooks first; the words hang on them.</p>
+   <div class="card">${MOVES.map((m,i)=>`<div class="mv"><div class="n">${["I","II","III","IV","V"][i]}</div>
+     <div style="min-width:0"><h3>${m.name}</h3><div class="t${m.vr?" vr":""}">${m.lines.map(esc).join("<br>")}</div></div>
+     <p class="hook">${m.hook}</p></div>`).join("")}</div></div>`;
+ },
+ fade(){
+  let lvl=store.get("fade",1);
+  const labels=["Full text","A few gaps","About 40% hidden","About 60% hidden","Most hidden","All hidden"];
+  const draw=()=>{
+   const cut=Math.round(WORDS.length*lvl/5);
+   view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
+    <p class="hint">Read it aloud, filling the blanks from memory. Tap a blank to check. Move up a level once you get through without peeking.</p>
+    <div class="row"><div class="levels">${[0,1,2,3,4,5].map(n=>`<button id="lv${n}" aria-pressed="${n===lvl}" data-n="${n}">${n}</button>`).join("")}</div>
+    <span class="lvlabel">Level ${lvl}: ${labels[lvl]}</span></div>
+    ${prayerHTML((w,i)=>RANK[i]<cut?`<span class="w hid" data-w="${esc(w)}" data-c="${esc(w)}">${esc(w)}</span>`:esc(w))}</div>`;
+   view.querySelectorAll(".hid").forEach(el=>el.onclick=()=>el.classList.toggle("peek"));
+   view.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>{lvl=+b.dataset.n;store.set("fade",lvl);draw();});
+  };draw();
+ },
+ cues(){
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
+   <p class="hint">Only the first letter of each word remains, with punctuation as a guide to the rhythm. Recite the whole prayer; tap a letter if you're stuck.</p>
+   ${prayerHTML(w=>{const m=w.match(/^([^A-Za-z]*)([A-Za-z])[A-Za-z']*(.*)$/);const c=m?m[1]+m[2]+m[3]:w;
+     return `<span class="w cue" data-w="${esc(w)}" data-c="${esc(c)}">${esc(c)}</span>`;})}</div>`;
+  bindPeek();
+ },
+ order(){
+  let next=0,pool=LINES.map((l,i)=>i).sort(()=>Math.random()-.5);
+  const draw=()=>{
+   view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
+    <p class="hint">Tap the lines in the order they're prayed.</p>
+    <div class="card">${next?LINES.slice(0,next).map(l=>`<p class="placed">${esc(l)}</p>`).join(""):`<p class="hint" style="margin:0">Line 1 of ${LINES.length} goes here.</p>`}
+    ${next===LINES.length?`<p class="done">All ${LINES.length} lines in order.</p>`:""}</div>
+    <div class="pool">${pool.map(i=>`<button class="chip" id="c${i}" data-i="${i}">${esc(LINES[i])}</button>`).join("")}</div>
+    <div class="row"><button class="btn" id="reshuffle">Shuffle again</button></div></div>`;
+   view.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
+     const i=+b.dataset.i;
+     if(i===next){next++;pool=pool.filter(x=>x!==i);draw();}
+     else{b.classList.remove("wrong");void b.offsetWidth;b.classList.add("wrong");}
+   });
+   document.getElementById("reshuffle").onclick=()=>MODES.order();
+  };draw();
+ },
+ recall(){
+  const best=store.get("best",null);
+  view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
+   <p class="hint">Type the whole prayer from memory. Spelling of each word counts; punctuation and capitals don't.</p>
+   <textarea id="recall" placeholder="Hail, holy Queen…" spellcheck="false" autocapitalize="sentences"></textarea>
+   <div class="row"><button class="btn primary" id="check">Check my recitation</button><button class="btn" id="clear">Clear</button></div>
+   <div id="result">${best!=null?`<p class="legend">Your best so far: ${best}%</p>`:""}</div></div>`;
+  const ta=document.getElementById("recall");
+  ta.value=store.get("draft","");ta.oninput=()=>store.set("draft",ta.value);
+  document.getElementById("clear").onclick=()=>{ta.value="";store.set("draft","");document.getElementById("result").innerHTML="";ta.focus();};
+  document.getElementById("check").onclick=()=>{
+   const said=ta.value.split(/\s+/).map(norm).filter(Boolean),exp=WORDS.map(norm);
+   const n=exp.length,m=said.length,dp=Array.from({length:n+1},()=>new Uint16Array(m+1));
+   for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=exp[i]===said[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+   const hit=new Array(n).fill(false);let i=0,j=0;
+   while(i<n&&j<m){if(exp[i]===said[j]){hit[i]=true;i++;j++;}else if(dp[i+1][j]>=dp[i][j+1])i++;else j++;}
+   const got=hit.filter(Boolean).length,pct=Math.round(got/n*100),extra=m-got;
+   const prev=store.get("best",0);if(pct>prev)store.set("best",pct);
+   document.getElementById("result").innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:10px">
+    <div class="score"><span class="big">${pct}%</span><span>${got} of ${n} words${extra?` · ${extra} extra`:""}</span>
+     <span class="best">${pct>prev?"New best":"Best: "+Math.max(prev,pct)+"%"}</span></div>
+    <p class="legend"><span class="r-ok">Green</span> words you had. <span class="r-miss">Red</span> words you missed or changed.</p>
+    <div class="prayer">${prayerHTML((w,k)=>`<span class="${hit[k]?"r-ok":"r-miss"}">${esc(w)}</span>`).replace('class="card prayer"','')}</div></div>`;
+  };
+ }
+};
+
+function go(m){mode=m;store.set("mode",m);
+  document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));
+  MODES[m]();}
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.m));
+go(MODES[mode]?mode:"study");
+</script>
+</body>
+</html>
