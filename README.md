@@ -24,14 +24,14 @@ Ranked by how often you'll use them:
 
 | # | Prayer | File | Why it's here |
 |---|---|---|---|
-| 1 | Our Father | `our-father.html` | Said at every Mass |
-| 2 | Hail Mary | `hail-mary.html` | The most-prayed Marian prayer |
-| 3 | Glory Be | `glory-be.html` | Ends many prayers, and every psalm in the Liturgy of the Hours |
+| 1 | Our Father | `our-father.html` | Said at every Mass; also included in the Rosary |
+| 2 | Hail Mary | `hail-mary.html` | The most-prayed Marian prayer; also included in the Rosary |
+| 3 | Glory Be | `glory-be.html` | Ends many prayers, and every psalm in the Liturgy of the Hours; also included in the Rosary |
 | 4 | Act of Contrition | `act-of-contrition.html` | Required in Confession |
-| 5 | Fatima Prayer | `fatima-prayer.html` | A short plea for mercy for ourselves and all souls |
-| 6 | Apostles' Creed | `apostles-creed.html` | The Church's ancient baptismal creed |
+| 5 | Fatima Prayer | `fatima-prayer.html` | A short plea for mercy for ourselves and all souls; also included in the Rosary |
+| 6 | Apostles' Creed | `apostles-creed.html` | The Church's ancient baptismal creed; also included in the Rosary |
 | 7 | Nicene Creed | `nicene-creed.html` | Said at every Sunday Mass, but it's the longest, so learn it after the shorter prayers |
-| 8 | Hail, Holy Queen | `hail-holy-queen.html` | Sung at Night Prayer for much of the year |
+| 8 | Hail, Holy Queen | `hail-holy-queen.html` | Sung at Night Prayer for much of the year; also included in the Rosary |
 | 9 | Memorare | `memorare.html` | A traditional devotion, not part of the Mass |
 
 ## Running locally
