@@ -7,9 +7,17 @@ A small static site for studying Catholic concepts and memorizing prayers.
 - `index.html` — home page listing all exercises
 - `prayers/` — prayer memorization pages. Each page only defines `window.PRAYER` (text, Latin, hooks); `practice.js` and `practice.css` build the exercises
 - `shared/emblems.js` — gold emblems used on prayer headers and home-page cards
+- `shared/review.js` — spaced review schedule (dates, intervals, status wording), shared by the home page and prayer pages
 - `images/` — Robert Zünd, *The Road to Emmaus* (1877), public domain via Wikimedia Commons
 
 To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER` data (give it a new `key`), and add it to the `PRAYERS` list in `index.html` with a `priority` and a short `why` (the home page can sort by Most Common or A–Z).
+
+## Exercises and reviews
+
+Each prayer has five steps: Study, Fade, Initials, Next line (cued recall: say the line that follows a cue) and Recite.
+Finishing all five starts a spaced review schedule stored as `<key>-review`: a Recite attempt on or after the due date is a review.
+Scoring 90% or more moves it to the next interval (1, 3, 7, 14, 30, 60, 120 days); anything lower brings it back tomorrow.
+The home page lists reviews that are due. For testing, set `localStorage["debug-today"]` to a `YYYY-MM-DD` date.
 
 ## Priority order
 

@@ -1,5 +1,5 @@
-// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads this script:
-//   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done and <key>-best)
+// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads shared/review.js and this script:
+//   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done, <key>-best and <key>-review)
 //   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js), heroPos (CSS background-position)
 //   about        array of HTML paragraphs shown at the top of Study
 //   placeholder  hint text for the Recite box
@@ -19,8 +19,10 @@ const ORDER=WORDS.map((_,i)=>i).sort((a,b)=>((a*61+17)%97)-((b*61+17)%97));
 const RANK=[];ORDER.forEach((w,r)=>RANK[w]=r);
 
 const store={get(k,d){try{const v=localStorage.getItem(P.key+"-"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-             set(k,v){try{localStorage.setItem(P.key+"-"+k,JSON.stringify(v))}catch(e){}}};
+             set(k,v){try{localStorage.setItem(P.key+"-"+k,JSON.stringify(v))}catch(e){}},
+             raw(k){try{return localStorage.getItem(k)}catch(e){return null}}}; // unprefixed, unparsed (e.g. "debug-today")
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const today=()=>Review.today(store.raw("debug-today"));
 
 document.title=P.title;
 document.body.innerHTML=`<div class="wrap">
@@ -36,11 +38,13 @@ document.body.innerHTML=`<div class="wrap">
     <cite class="credit">Zünd, The Road to Emmaus, 1877</cite>
   </a></header>
   <div class="path"><span id="pathlabel">0 of 5 steps</span><div class="bar"><div class="fill" id="pathfill" style="width:0"></div></div></div>
+  <div class="review" id="review" role="status"></div>
   <nav role="tablist" id="tabs">
     <button role="tab" data-m="study"><b>1</b>Study</button>
     <button role="tab" data-m="fade"><b>2</b>Fade</button>
     <button role="tab" data-m="cues"><b>3</b>Initials</button>
-    <button role="tab" data-m="order"><b>4</b>Order</button>
+    <!-- Labeled "Next line" but keyed "order": the step used to be Order, and <key>-done.order must keep counting. -->
+    <button role="tab" data-m="order"><b>4</b>Next line</button>
     <button role="tab" data-m="recall"><b>5</b>Recite</button>
   </nav>
   <main id="view"></main>
@@ -49,7 +53,7 @@ document.body.innerHTML=`<div class="wrap">
     <ol>
       <li>Learn the ${NUM} movements in Study until you can name them in order.</li>
       <li>Fade up one level each day, reading aloud until it feels easy.</li>
-      <li>Use Initials, then Order, to check the sequence.</li>
+      <li>Use Initials, then Next line, to recall it line by line.</li>
       <li>Recite from memory. Repeat tomorrow before anything else.</li>
     </ol>
   </footer>
@@ -62,6 +66,15 @@ const view=document.getElementById("view");
 
 // Progress: one badge per exercise, kept in localStorage alongside the rest.
 let done=store.get("done",{});
+// Review schedule: a separate layer on top of the five badges (see shared/review.js).
+let review=Review.clean(store.get("review",null));
+{const m=Review.migrate(review,STEPS.every(s=>done[s]),today());if(m!==review){review=m;store.set("review",review);}}
+function drawReview(){
+  const s=Review.status(review,today()),el=document.getElementById("review");
+  el.className="review "+s.state;
+  el.innerHTML=`<span>${esc(s.text)}</span>${s.state==="due"?`<button class="btn primary" id="reviewnow">Review now</button>`:""}`;
+  if(s.state==="due")document.getElementById("reviewnow").onclick=()=>{go("recall");document.getElementById("recall").focus();};
+}
 function drawProgress(){
   const n=STEPS.filter(s=>done[s]).length;
   document.getElementById("pathlabel").textContent=n===5?"All 5 steps complete":`${n} of 5 steps`;
@@ -83,7 +96,9 @@ function complete(step){
   if(done[step])return;
   done[step]=true;store.set("done",done);drawProgress();burst();
   const n=STEPS.filter(s=>done[s]).length;
-  toast(n===5?`<b>✦</b> All five steps complete. You know the ${esc(P.title.replace(/^The /,""))} by heart.`:`<b>✓</b> Step ${STEPS.indexOf(step)+1} complete · ${n} of 5`);
+  const first=n===5&&!review;
+  if(first){review=Review.start(today());store.set("review",review);drawReview();}
+  toast(n===5?`<b>✦</b> All five steps complete.${first?" First review: tomorrow.":""}`:`<b>✓</b> Step ${STEPS.indexOf(step)+1} complete · ${n} of 5`);
 }
 
 function prayerHTML(fn){ // fn(word,index) -> html
@@ -171,27 +186,59 @@ const MODES={
   bindPeek();
   document.getElementById("recited").onclick=e=>{complete("cues");e.target.textContent="✓ Recited from initials";};
  },
+ // Next line (cued recall). The step key stays "order" so progress saved under the old Order exercise still counts.
+ // Show the line before, hide the target; the learner says it aloud, reveals, and marks Got it / Missed it.
+ // A missed line comes back 3 cards later. The session ends when every line has been marked Got it once.
  order(){
-  let next=0,pool=LINES.map((l,i)=>i).sort(()=>Math.random()-.5);
+  const INFO=MOVES.flatMap(m=>m.lines.map((l,li)=>({l,name:m.name,vr:!!m.vr,mark:m.vr?(li===0?"℣":"℟"):""})));
+  const lineHTML=i=>`${INFO[i].mark?`<span class="mark">${INFO[i].mark}</span>`:""}${esc(INFO[i].l)}`;
+  let shuffled=store.get("nextmode","inorder")==="shuffled",s;
+  const start=()=>{const q=LINES.map((_,i)=>i);if(shuffled)q.sort(()=>Math.random()-.5);
+    s={queue:q,got:new Set(),missed:new Set(),shown:false};draw();};
+  const reveal=()=>{s.shown=true;draw();};
+  const mark=ok=>{const i=s.queue.shift();
+    if(ok)s.got.add(i);else{s.missed.add(i);s.queue.splice(Math.min(3,s.queue.length),0,i);}
+    s.shown=false;draw();if(!s.queue.length)complete("order");};
   const draw=()=>{
+   const n=LINES.length,i=s.queue[0],fin=i===undefined;
+   const cardHTML=fin?`<div class="card nl"><p class="done">All ${n} lines recalled.</p>
+     ${s.missed.size?`<p class="hint">Missed at least once, so worth drilling:</p>
+      <div>${[...s.missed].sort((a,b)=>a-b).map(k=>`<p class="placed miss${INFO[k].vr?" vr":""}">${lineHTML(k)}</p>`).join("")}</div>`
+      :`<p class="hint">No misses: every line on the first try.</p>`}
+     <div class="row"><button class="btn primary" id="again">Go again</button></div></div>`
+    :`<div class="card nl">
+     <h3 class="qh">${esc(INFO[i].name)}</h3>
+     <p class="nl-cue${i&&INFO[i-1].vr?" vr":""}">${i?lineHTML(i-1):`<span class="nl-start">(Start of the prayer)</span> ${esc(P.title)}`}</p>
+     <div class="nl-target${s.shown?" shown":""}${s.shown&&INFO[i].vr?" vr":""}" aria-live="polite">${s.shown?lineHTML(i):"Say the next line aloud, then reveal it."}</div>
+     <div class="row">${s.shown?`<button class="btn ok" id="got">Got it</button><button class="btn" id="miss">Missed it</button>`
+       :`<button class="btn primary" id="reveal">Reveal</button>`}</div>
+     <p class="kbd">Keyboard: Space or Enter to reveal · 1 got it · 2 missed it</p></div>`;
    view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
-    <p class="hint">Tap the lines in the order they're prayed.</p>
-    <div class="card">${next?LINES.slice(0,next).map(l=>`<p class="placed">${esc(l)}</p>`).join(""):`<p class="hint" style="margin:0">Line 1 of ${LINES.length} goes here.</p>`}
-    ${next===LINES.length?`<p class="done">All ${LINES.length} lines in order.</p>`:""}</div>
-    <div class="pool">${pool.map(i=>`<button class="chip" id="c${i}" data-i="${i}">${esc(LINES[i])}</button>`).join("")}</div>
-    <div class="row"><button class="btn" id="reshuffle">Shuffle again</button></div></div>`;
-   view.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{
-     const i=+b.dataset.i;
-     if(i===next){next++;pool=pool.filter(x=>x!==i);draw();if(next===LINES.length)complete("order");}
-     else{b.classList.remove("wrong");void b.offsetWidth;b.classList.add("wrong");}
-   });
-   document.getElementById("reshuffle").onclick=()=>MODES.order();
-  };draw();
+    <p class="hint">Read the cue, then say the line that comes next from memory.</p>
+    <div class="row" style="justify-content:space-between">
+     <div class="seg" role="group" aria-label="Line order"><button type="button" data-mode="inorder" aria-pressed="${!shuffled}">In order</button><button type="button" data-mode="shuffled" aria-pressed="${shuffled}">Shuffled</button></div>
+     <span class="nl-count">${s.got.size} of ${n} lines</span></div>
+    ${cardHTML}</div>`;
+   const $=id=>document.getElementById(id);
+   view.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{shuffled=b.dataset.mode==="shuffled";store.set("nextmode",shuffled?"shuffled":"inorder");start();});
+   if($("reveal"))$("reveal").onclick=reveal;
+   if($("got"))$("got").onclick=()=>mark(true);
+   if($("miss"))$("miss").onclick=()=>mark(false);
+   if($("again"))$("again").onclick=start;
+  };
+  onKey=e=>{
+   const t=e.target instanceof Element?e.target:document.body;
+   if(e.metaKey||e.ctrlKey||e.altKey||t.closest("textarea,input,select")||!s.queue.length)return;
+   if(!s.shown&&(e.key===" "||e.key==="Enter")){if(t.tagName==="BUTTON"&&t.id!=="reveal")return;e.preventDefault();reveal();}
+   else if(s.shown&&(e.key==="1"||e.key==="2")){e.preventDefault();mark(e.key==="1");}
+  };
+  start();
  },
  recall(){
   const best=store.get("best",null);
   view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
    <p class="hint">Type the whole prayer from memory. Spelling of each word counts; punctuation and capitals don't. Score 90% or more to complete this step.</p>
+   ${Review.isDue(review,today())?`<p class="rvnote due">This attempt counts as today's review.</p>`:""}
    <textarea id="recall" placeholder="${esc(P.placeholder)}" spellcheck="false" autocapitalize="sentences"></textarea>
    <div class="row"><button class="btn primary" id="check">Check my recitation</button><button class="btn" id="clear">Clear</button></div>
    <div id="result">${best!=null?`<p class="legend">Your best so far: ${best}%</p>`:""}</div></div>`;
@@ -207,9 +254,18 @@ const MODES={
    while(i<n&&j<m){if(exp[i]===said[j]){hit[i]=true;i++;j++;}else if(dp[i+1][j]>=dp[i][j+1])i++;else j++;}
    const got=hit.filter(Boolean).length,pct=Math.round(got/n*100),extra=m-got;
    const prev=store.get("best",0);if(pct>prev)store.set("best",pct);
+   // On or after the due date this attempt is the review; before it, it's practice and the schedule stays put.
+   const t=today();let note="";
+   if(Review.isDue(review,t)){
+    review=Review.record(review,pct,t);store.set("review",review);drawReview();
+    const dn=view.querySelector(".rvnote.due");if(dn)dn.remove();
+    note=pct>=Review.PASS?`Review passed. ${Review.nextText(review,t)}.`:`Below ${Review.PASS}%, so this prayer comes back tomorrow for another review.`;
+    toast(`<b>${pct>=Review.PASS?"✓":"↻"}</b> ${esc(note)}`);
+   }else if(review)note=`Practice attempt. Your review schedule doesn't change. ${Review.status(review,t).text}.`;
    document.getElementById("result").innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:10px">
     <div class="score"><span class="big">${pct}%</span><span>${got} of ${n} words${extra?` · ${extra} extra`:""}</span>
      <span class="best">${pct>prev?"New best":"Best: "+Math.max(prev,pct)+"%"}</span></div>
+    ${note?`<p class="rvnote">${esc(note)}</p>`:""}
     <p class="legend"><span class="r-ok">Green</span> words you had. <span class="r-miss">Red</span> words you missed or changed.</p>
     <div class="prayer">${prayerHTML((w,k)=>`<span class="${hit[k]?"r-ok":"r-miss"}">${esc(w)}</span>`).replace('class="card prayer"','')}</div></div>`;
    if(pct>=90)complete("recall");
@@ -217,10 +273,16 @@ const MODES={
  }
 };
 
-function go(m){mode=m;store.set("mode",m);
+// Keyboard shortcuts belong to the current tab; switching tabs clears them.
+let onKey=null;
+document.addEventListener("keydown",e=>{if(onKey)onKey(e);});
+
+function go(m){mode=m;store.set("mode",m);onKey=null;
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));
   MODES[m]();}
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.m));
 drawProgress();
-go(MODES[mode]?mode:"study");
+drawReview();
+// "#recite" (from the home page's Due today list) opens straight to Recite.
+go(location.hash==="#recite"?"recall":MODES[mode]?mode:"study");
 })();
