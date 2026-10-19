@@ -116,7 +116,7 @@ const MODES={
   };draw();
  },
  fade(){
-  let lvl=store.get("fade",1);
+  let lvl=0; // always open on the full text
   const labels=["Full text","A few gaps","About 40% hidden","About 60% hidden","Most hidden","All hidden"];
   const draw=()=>{
    const cut=Math.round(WORDS.length*lvl/5);
@@ -126,7 +126,7 @@ const MODES={
     <span class="lvlabel">Level ${lvl}: ${labels[lvl]}</span></div>
     ${prayerHTML((w,i)=>RANK[i]<cut?`<span class="w hid" data-w="${esc(w)}" data-c="${esc(w)}">${esc(w)}</span>`:esc(w))}</div>`;
    view.querySelectorAll(".hid").forEach(el=>el.onclick=()=>el.classList.toggle("peek"));
-   view.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>{lvl=+b.dataset.n;store.set("fade",lvl);draw();if(lvl===5)complete("fade");});
+   view.querySelectorAll(".levels button").forEach(b=>b.onclick=()=>{lvl=+b.dataset.n;draw();if(lvl===5)complete("fade");});
   };draw();
  },
  cues(){
