@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prayer Quest</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap">
+<style>
+/* Gamified version: starting page. Same palette as the main site (Zünd's "The Road to Emmaus"). */
+:root{
+  --bg:#F4EFE1; --card:#FFFDF6; --ink:#262A18; --muted:#666449; --line:#DDD5BC;
+  --accent:#3F5A26; --accent-deep:#1F2B12; --accent-soft:#E6EAD3; --gold:#94681E; --gold-bright:#E3BC6A; --gold-soft:#F5E9CC;
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+  --sans:"Alegreya Sans",-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#12150C; --card:#1B1F13; --ink:#ECE6D2; --muted:#A8A487; --line:#30351F;
+  --accent:#B4C98A; --accent-deep:#1A2410; --accent-soft:#252C18; --gold:#E2B865; --gold-bright:#E9C677; --gold-soft:#2E2715; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12150C; --card:#1B1F13; --ink:#ECE6D2; --muted:#A8A487; --line:#30351F;
+  --accent:#B4C98A; --accent-deep:#1A2410; --accent-soft:#252C18; --gold:#E2B865; --gold-bright:#E9C677; --gold-soft:#2E2715; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.home{font-size:14px;color:var(--accent);text-decoration:none;font-weight:500;align-self:flex-start;padding:12px 8px 12px 0;margin:-12px 0 -10px}
+.home:hover{text-decoration:underline}
+.hero{position:relative;overflow:hidden;border-radius:18px;padding:26px 22px;color:#FFF8E6;
+  background:url("../images/zund-road-to-emmaus.jpg") 60% 80%/cover no-repeat,var(--accent-deep)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(18,24,9,.88),rgba(18,24,9,.45))}
+.hero>*{position:relative;z-index:1}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);font-weight:700}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(30px,7.5vw,42px);line-height:1.1;margin:4px 0 0}
+.hero p{margin:8px 0 0;color:#E4DEC4;max-width:40ch}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 18px}
+.card p{margin:0}
+.card p+p{margin-top:8px}
+.muted{color:var(--muted);font-size:14.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="home" href="../index.html">← Catholic Prayer Study</a>
+  <header class="hero">
+    <span class="eyebrow">Gamified version</span>
+    <h1>Prayer Quest</h1>
+    <p>Learn the same prayers through play.</p>
+  </header>
+  <div class="card">
+    <p>This is the home of the gamified version. It's being built.</p>
+    <p class="muted">It will reuse the prayers in <code>../shared/prayers.js</code> and the prayer pages in <code>../prayers/</code>.</p>
+  </div>
+</div>
+</body>
+</html>
