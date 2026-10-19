@@ -45,7 +45,6 @@ a.hero:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
   .emblem{position:absolute;top:12px;right:12px;width:58px;height:58px}
   .hero .eyebrow{display:block}
   .hero .eyebrow,.hero h1{padding-right:60px}
-  .hero .sub{display:none}
 }
 .emblem .star{fill:var(--gold-bright)}
 .emblem .twinkle{animation:twinkle 3.2s ease-in-out infinite}

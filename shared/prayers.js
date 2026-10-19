@@ -12,3 +12,5 @@ window.PRAYERS=[
  {href:"prayers/hail-holy-queen.html",key:"hhq",rosary:true,priority:8,why:"Sung at Night Prayer for much of the year",emblem:"marian",title:"Hail, Holy Queen",latin:"Salve Regina",d:"An ancient Marian antiphon"},
  {href:"prayers/memorare.html",key:"mem",priority:9,why:"A traditional devotion, not part of the Mass",emblem:"rose",title:"The Memorare",latin:"Memorare",d:"A prayer of confident trust in Mary"}
 ];
+// A card's description: the given text plus the Rosary note where it applies. Also used as the prayer page's header line.
+window.prayerNote=(p,text)=>text+(p.rosary?"; also included in the Rosary":"");

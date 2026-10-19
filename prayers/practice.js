@@ -1,4 +1,4 @@
-// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads this script:
+// Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads shared/prayers.js and this script:
 //   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done and <key>-best)
 //   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js), heroPos (CSS background-position)
 //   about        array of HTML paragraphs shown at the top of Study
@@ -23,13 +23,16 @@ const store={get(k,d){try{const v=localStorage.getItem(P.key+"-"+k);return v==nu
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
 document.title=P.title;
+// Header line: the same description as this prayer's home page card (Most Common view), from shared/prayers.js.
+const CARD=(window.PRAYERS||[]).find(p=>p.key===P.key);
+const DESC=CARD&&window.prayerNote?window.prayerNote(CARD,CARD.why):"";
 document.body.innerHTML=`<div class="wrap">
   <a class="home" href="../index.html">← All exercises</a>
   <header><a class="hero" href="../index.html" title="Back to all prayers" style="--hero-pos:${P.heroPos||"70% 72%"}">
     <div style="position:relative;z-index:1;min-width:0">
       <span class="eyebrow">${P.eyebrow} · Memory practice</span>
       <h1>${P.title}</h1>
-      <p class="sub">Five exercises, from reading to reciting it cold.</p>
+      ${DESC?`<p class="sub">${esc(DESC)}</p>`:""}
       <p class="latin">${P.incipit}</p>
     </div>
     <svg class="emblem" id="emblem" viewBox="-50 -50 100 100" aria-hidden="true"></svg>
