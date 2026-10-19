@@ -21,6 +21,10 @@
     // Glory Be: rays of glory around the Trinity triangle.
     glory:()=>ring((x,y,a)=>`<path ${a} d="M${(x*.88).toFixed(2)},${(y*.88).toFixed(2)}L${(x*1.1).toFixed(2)},${(y*1.1).toFixed(2)}" stroke="${GOLD}" stroke-width="2.4" stroke-linecap="round"/>`)+halo+
       `<path d="M0,-15L13,8.5H-13Z" fill="none" stroke="${LIGHT}" stroke-width="2.6" stroke-linejoin="round"/><circle cy="1" r="2.6" fill="${GOLD}"/>`,
+    // Memorare: the mystical rose, a Marian title from the Litany of Loreto.
+    rose:()=>ring((x,y,a)=>`<circle ${a} cx="${x}" cy="${y}" r="2.8" fill="${GOLD}"/>`)+halo+
+      [0,72,144,216,288].map(d=>{const r=(d-90)*Math.PI/180;return `<circle cx="${(8*Math.cos(r)).toFixed(2)}" cy="${(8*Math.sin(r)).toFixed(2)}" r="8" fill="none" stroke="${LIGHT}" stroke-width="2"/>`;}).join("")+
+      `<circle r="4" fill="${GOLD}"/>`,
     // Our Father: the Chi-Rho, monogram of Christ who taught the prayer.
     paternoster:()=>ring((x,y,a)=>`<path ${a} fill="${GOLD}" d="M${x},${y-4}L${x+3},${y}L${x},${y+4}L${x-3},${y}Z"/>`)+halo+
       `<g fill="none" stroke="${LIGHT}" stroke-width="2.6" stroke-linecap="round"><path d="M0,-17V18"/><path d="M0,-17H4.5A6,6 0 0 1 4.5,-5H0"/><path d="M-10,-1L10,13M10,-1L-10,13"/></g>`
