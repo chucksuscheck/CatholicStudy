@@ -51,7 +51,7 @@ document.body.innerHTML=`<div class="wrap">
       <li>Learn the ${NUM} movements in Study until you can name them in order.</li>
       <li>Fade up one level each day, reading aloud until it feels easy.</li>
       <li>Use Initials, then Next line, to recall it line by line.</li>
-      <li>Recite from memory. Repeat tomorrow before anything else.</li>
+      <li>Recite from memory.</li>
     </ol>
   </footer>
 </div>
