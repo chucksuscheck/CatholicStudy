@@ -27,6 +27,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font
 .hero{position:relative;overflow:hidden;border-radius:18px;padding:22px 20px 30px;color:#FFF8E6;
   background:url("../images/zund-road-to-emmaus.jpg") var(--hero-pos,70% 72%)/cover no-repeat,var(--accent-deep);
   display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;box-shadow:0 10px 30px rgba(31,43,18,.18)}
+a.hero{text-decoration:none;transition:transform .15s,box-shadow .15s}
+a.hero:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(31,43,18,.28)}
+a.hero:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){a.hero{transition:none}a.hero:hover{transform:none}}
 .hero::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(100deg,rgba(18,24,9,.88) 0%,rgba(18,24,9,.66) 55%,rgba(18,24,9,.25) 100%)}
 .hero .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);font-weight:700}

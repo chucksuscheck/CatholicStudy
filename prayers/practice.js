@@ -1,6 +1,6 @@
 // Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads this script:
 //   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done and <key>-best)
-//   title, eyebrow, incipit (opening Latin words), emblem ("marian" | "apostles" | "nicene"), heroPos (CSS background-position)
+//   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js), heroPos (CSS background-position)
 //   about        array of HTML paragraphs shown at the top of Study
 //   placeholder  hint text for the Recite box
 //   moves        [{name, hook (HTML), lines:[...], latin:[...], vr (true for a versicle & response)}]
@@ -25,7 +25,7 @@ const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 document.title=P.title;
 document.body.innerHTML=`<div class="wrap">
   <a class="home" href="../index.html">← All exercises</a>
-  <header class="hero" style="--hero-pos:${P.heroPos||"70% 72%"}">
+  <header><a class="hero" href="../index.html" title="Back to all prayers" style="--hero-pos:${P.heroPos||"70% 72%"}">
     <div style="position:relative;z-index:1;min-width:0">
       <span class="eyebrow">${P.eyebrow} · Memory practice</span>
       <h1>${P.title}</h1>
@@ -34,7 +34,7 @@ document.body.innerHTML=`<div class="wrap">
     </div>
     <svg class="emblem" id="emblem" viewBox="-50 -50 100 100" aria-hidden="true"></svg>
     <cite class="credit">Zünd, The Road to Emmaus, 1877</cite>
-  </header>
+  </a></header>
   <div class="path"><span id="pathlabel">0 of 5 steps</span><div class="bar"><div class="fill" id="pathfill" style="width:0"></div></div></div>
   <nav role="tablist" id="tabs">
     <button role="tab" data-m="study"><b>1</b>Study</button>
