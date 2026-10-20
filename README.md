@@ -16,8 +16,8 @@ To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER`
 ## Exercises and review
 
 Each prayer has five steps: Study, Fade, Initials, Next line (cued recall: say the line that follows a cue) and Recite.
-Recite can test the whole prayer, build it up section by section, or drill one section; only the whole prayer counts toward your best score and the step.
-Once all five steps are done, the prayer appears in the home page's Review list (lowest best recital first), which opens straight to Recite.
+Recite is said aloud, not typed: say the whole prayer from memory, then Show prayer to check yourself and mark it said correctly to complete the step.
+Once all five steps are done, the prayer appears in the home page's Review list, which opens straight to Recite. The list is ordered by the best recital score from the old typed Recite (lowest first); spoken recitals aren't scored.
 
 ## Priority order
 
