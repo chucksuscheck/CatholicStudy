@@ -247,88 +247,20 @@ const MODES={
   };
   start();
  },
- // Recite. Long prayers (3+ movements) offer a scope: Whole prayer (scored exactly as before), Build up (movements I..k)
- // or One section. Only Whole prayer updates best and completes the recall step; the others are practice.
- // Every check, in any scope, updates per-movement scores (<key>-sections) and the missed-word list Fade hides first (<key>-missed).
+ // Recite: say the whole prayer aloud from memory; nothing is typed. Show prayer reveals the words to check yourself.
  recall(){
-  const SCOPED=MOVES.length>=3,last=MOVES.length-1;
-  const sc=Object.assign({mode:"whole",k:1,sec:0},store.get("scope",{}));
-  if(!SCOPED||!["whole","build","one"].includes(sc.mode))sc.mode="whole";
-  sc.k=Math.min(Math.max(+sc.k||0,0),last);sc.sec=Math.min(Math.max(+sc.sec||0,0),last);
-  const whole=()=>sc.mode==="whole";
-  const span=()=>sc.mode==="build"?[0,RANGE[sc.k][1]]:sc.mode==="one"?RANGE[sc.sec]:[0,WORDS.length];
-  const buildLabel=k=>`${k?ROMAN[0]+"–"+ROMAN[k]:ROMAN[0]} · ${MOVES[k].name}`;
-  const draftKey=()=>whole()?"draft":"draft-part"; // the whole-prayer draft is kept apart from section practice
-  const setScope=o=>{Object.assign(sc,o);store.set("scope",{mode:sc.mode,k:sc.k,sec:sc.sec});store.set("draft-part","");draw();};
-  // Lowest average over recent scores, among movements with 2+ scores; hidden once everything averages 95%+.
-  const weakest=()=>{const S=store.get("sections",[]);let w=null;
-    MOVES.forEach((_,i)=>{const r=(Array.isArray(S)&&S[i]&&S[i].recent)||[];if(r.length<2)return;
-      const avg=r.reduce((x,y)=>x+y,0)/r.length;if(!w||avg<w.avg)w={i,avg,n:r.length};});
-    return w&&w.avg<95?w:null;};
-  const drawWeak=()=>{const el=document.getElementById("weak");if(!el)return;const w=weakest();el.hidden=!w;
-    el.innerHTML=w?`<span>Weakest section: <strong>${ROMAN[w.i]} ${esc(MOVES[w.i].name)}</strong>, ${Math.round(w.avg)}% over your last ${w.n} tries</span>
-      <button class="btn gold" id="drill">Drill this section</button>`:"";
-    if(w)document.getElementById("drill").onclick=()=>{setScope({mode:"one",sec:w.i});document.getElementById("recall").focus();};};
+  let shown=false,said=false;
   const draw=()=>{
-  const best=store.get("best",null);
-  const pm=sc.mode==="one"&&sc.sec>0?MOVES[sc.sec-1]:null,after=pm?pm.lines[pm.lines.length-1]:null;
   view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
-   ${SCOPED?`<div class="scope">
-    <div class="row"><div class="seg" role="group" aria-label="What to recite">${[["whole","Whole prayer"],["build","Build up"],["one","One section"]]
-      .map(([v,t])=>`<button type="button" data-scope="${v}" aria-pressed="${sc.mode===v}">${t}</button>`).join("")}</div>
-     ${sc.mode==="build"?`<select id="buildk" aria-label="Movements to recite">${MOVES.map((_,k)=>`<option value="${k}"${k===sc.k?" selected":""}>${esc(buildLabel(k))}</option>`).join("")}</select>`:""}
-     ${sc.mode==="one"?`<select id="onesec" aria-label="Section to recite">${MOVES.map((m,k)=>`<option value="${k}"${k===sc.sec?" selected":""}>${ROMAN[k]} · ${esc(m.name)}</option>`).join("")}</select>`:""}</div>
-    ${whole()?"":`<p class="scope-note">Practice only: doesn't change your best score or step progress.</p>`}</div>
-   <div class="weak" id="weak" hidden></div>`:""}
-   <p class="hint">${whole()?"Type the whole prayer from memory.":sc.mode==="build"?`Type movements ${esc(buildLabel(sc.k).split(" · ")[0])} from memory.`:`Type section ${ROMAN[sc.sec]} from memory.`} Spelling of each word counts; punctuation and capitals don't.${whole()?" Score 90% or more to complete this step.":""}</p>
-   <p class="aloud">Say each line aloud as you type it. Speaking the words helps you remember them.</p>
-   ${after?`<p class="after"><span>Comes after:</span>${pm.vr?`<span class="mark">℟</span>`:""}${esc(after)}</p>`:""}
-   <textarea id="recall" placeholder="${esc(sc.mode==="one"&&sc.sec>0?"Type this section…":P.placeholder)}" spellcheck="false" autocapitalize="sentences"></textarea>
-   <div class="row"><button class="btn primary" id="check">Check my recitation</button><button class="btn" id="clear">Clear</button></div>
-   <div id="result">${whole()&&best!=null?`<p class="legend">Your best so far: ${best}%</p>`:""}</div></div>`;
-  const ta=document.getElementById("recall");
-  ta.value=store.get(draftKey(),"");ta.oninput=()=>store.set(draftKey(),ta.value);
-  view.querySelectorAll(".scope .seg button").forEach(b=>b.onclick=()=>{if(b.dataset.scope!==sc.mode)setScope({mode:b.dataset.scope});});
-  if(document.getElementById("buildk"))document.getElementById("buildk").onchange=e=>setScope({k:+e.target.value});
-  if(document.getElementById("onesec"))document.getElementById("onesec").onchange=e=>setScope({sec:+e.target.value});
-  drawWeak();
-  document.getElementById("clear").onclick=()=>{ta.value="";store.set(draftKey(),"");document.getElementById("result").innerHTML="";ta.focus();};
-  document.getElementById("check").onclick=()=>{
-   const [a,b]=span(),said=ta.value.split(/\s+/).map(norm).filter(Boolean),exp=WORDS.slice(a,b).map(norm);
-   // LCS to find which expected words were recalled in order
-   const n=exp.length,m=said.length,dp=Array.from({length:n+1},()=>new Uint16Array(m+1));
-   for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)dp[i][j]=exp[i]===said[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
-   const hit=new Array(n).fill(false);let i=0,j=0;
-   while(i<n&&j<m){if(exp[i]===said[j]){hit[i]=true;i++;j++;}else if(dp[i+1][j]>=dp[i][j+1])i++;else j++;}
-   const got=hit.filter(Boolean).length,pct=Math.round(got/n*100),extra=m-got;
-   // Missed words (global indices) for Fade: words in this scope take their new status; words outside keep theirs.
-   const miss=new Set(store.get("missed",[]));for(let k=a;k<b;k++){if(hit[k-a])miss.delete(k);else miss.add(k);}
-   store.set("missed",[...miss].sort((x,y)=>x-y));
-   // Per-movement accuracy for every movement inside this scope, last 5 scores each.
-   const S0=store.get("sections",[]),S=MOVES.map((_,k)=>({recent:((Array.isArray(S0)&&S0[k]&&S0[k].recent)||[]).slice(-5)}));
-   RANGE.forEach(([s,e],k)=>{if(s<a||e>b)return;let h=0;for(let x=s;x<e;x++)if(hit[x-a])h++;
-     S[k].recent=[...S[k].recent,Math.round(h/(e-s)*100)].slice(-5);});
-   store.set("sections",S);
-   drawWeak();
-   if(!whole()){
-    const more=sc.mode==="build"&&pct>=90&&sc.k<last;
-    document.getElementById("result").innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:10px">
-     <div class="score"><span class="big">${pct}%</span><span>${got} of ${n} words${extra?` · ${extra} extra`:""}</span>
-      <span class="best">Practice · ${esc(sc.mode==="build"?buildLabel(sc.k):`${ROMAN[sc.sec]} · ${MOVES[sc.sec].name}`)}</span></div>
-     ${more?`<div class="row"><button class="btn primary" id="addsec">Add section ${sc.k+2}: ${esc(MOVES[sc.k+1].name)}</button></div>`:""}
-     <p class="legend"><span class="r-ok">Green</span> words you had. <span class="r-miss">Red</span> words you missed or changed.</p>
-     <div class="prayer">${prayerHTML((w,k)=>`<span class="${hit[k-a]?"r-ok":"r-miss"}">${esc(w)}</span>`,a,b).replace('class="card prayer"','')}</div></div>`;
-    if(more)document.getElementById("addsec").onclick=()=>{setScope({k:sc.k+1});document.getElementById("recall").focus();};
-    return;
-   }
-   const prev=store.get("best",0);if(pct>prev)store.set("best",pct);
-   document.getElementById("result").innerHTML=`<div class="card" style="display:flex;flex-direction:column;gap:10px">
-    <div class="score"><span class="big">${pct}%</span><span>${got} of ${n} words${extra?` · ${extra} extra`:""}</span>
-     <span class="best">${pct>prev?"New best":"Best: "+Math.max(prev,pct)+"%"}</span></div>
-    <p class="legend"><span class="r-ok">Green</span> words you had. <span class="r-miss">Red</span> words you missed or changed.</p>
-    <div class="prayer">${prayerHTML((w,k)=>`<span class="${hit[k]?"r-ok":"r-miss"}">${esc(w)}</span>`).replace('class="card prayer"','')}</div></div>`;
-   if(pct>=90)complete("recall");
-  };
+   <p class="aloud">Say the whole prayer aloud from memory. When you've finished, show the prayer and check yourself.</p>
+   <div aria-live="polite">${shown?prayerHTML(esc):""}</div>
+   <div class="row">${shown
+     ?`<button class="btn ok" id="said">${said||done.recall?"✓ Said it from memory":"I said it correctly"}</button><button class="btn" id="again">Say it again</button>`
+     :`<button class="btn primary" id="show">Show prayer</button>`}</div></div>`;
+  const $=id=>document.getElementById(id);
+  if($("show"))$("show").onclick=()=>{shown=true;draw();};
+  if($("said"))$("said").onclick=()=>{said=true;complete("recall");draw();};
+  if($("again"))$("again").onclick=()=>{shown=false;said=false;draw();};
   };draw();
  }
 };
