@@ -3,15 +3,21 @@
 //   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js), heroPos (CSS background-position)
 //   about        array of HTML paragraphs shown at the top of Study
 //   placeholder  hint text for the Recite box
-//   moves        [{name, hook (HTML), lines:[...], latin:[...], vr (true for a versicle & response)}]
+//   moves        [{name, desc (what it says, without the prayer's words; the Recite hint), hook (HTML), lines:[...], latin:[...], vr (true for a versicle & response)}]
+//   parts        optional, for long prayers: [{name, from, to}] splits moves[from..to) into parts. Steps 1–4 then work on
+//                one part at a time (picked above the tabs) and count as done once every part has done them; Recite is always whole.
 (function(){
 const P=window.PRAYER;
-const MOVES=P.moves;
-const LINES=MOVES.flatMap(m=>m.lines);
-const WORDS=LINES.join(" ").split(/\s+/);
+const ALL=P.moves,PARTS=P.parts||null;
+// The movements the current step works on: one part for steps 1–4 of a sectioned prayer, otherwise the whole prayer.
+// OFF is the first movement's index in the whole prayer (for numbering); PREV the line just before the part, if any.
+let MOVES,LINES,WORDS,NUM,OFF,PREV;
+const scopeTo=(a,b)=>{MOVES=ALL.slice(a,b);LINES=MOVES.flatMap(m=>m.lines);WORDS=LINES.join(" ").split(/\s+/);
+  NUM=["one","two","three","four","five","six","seven","eight","nine","ten"][MOVES.length-1]||MOVES.length;
+  OFF=a;PREV=a?ALL[a-1].lines[ALL[a-1].lines.length-1]:null;};
+scopeTo(0,ALL.length);
 const norm=s=>s.toLowerCase().replace(/[^a-z]/g,"");
 const STEPS=["study","fade","cues","order","recall"];
-const NUM=["one","two","three","four","five","six","seven","eight","nine","ten"][MOVES.length-1]||MOVES.length;
 const ROMAN=["I","II","III","IV","V","VI","VII","VIII","IX","X"];
 
 // Word-index range [start, end) of each movement within WORDS.
@@ -27,7 +33,7 @@ document.title=P.title;
 const CARD=(window.PRAYERS||[]).find(p=>p.key===P.key);
 const DESC=CARD&&window.prayerNote?window.prayerNote(CARD,CARD.why):"";
 document.body.innerHTML=`<div class="wrap">
-  <a class="home" href="../index.html">← All exercises</a>
+  <a class="home" href="../index.html">← All prayers</a>
   <header><a class="hero" href="../index.html" title="Back to all prayers" style="--hero-pos:${P.heroPos||"70% 72%"}">
     <div style="position:relative;z-index:1;min-width:0">
       <span class="eyebrow">${P.eyebrow} · Memory practice</span>
@@ -47,6 +53,7 @@ document.body.innerHTML=`<div class="wrap">
     <button role="tab" data-m="order"><b>4</b>Next line</button>
     <button role="tab" data-m="recall"><b>5</b>Recite</button>
   </nav>
+  <div class="parts" id="parts" hidden></div>
   <main id="view"></main>
   <div class="nextnav" id="nextnav"></div>
   <footer>
@@ -57,6 +64,7 @@ document.body.innerHTML=`<div class="wrap">
       <li>Use Initials, then Next line, to recall it line by line.</li>
       <li>Recite from memory.</li>
     </ol>
+    ${PARTS?`<p>This prayer is long, so steps 1–4 are done one part at a time. Once every part is done, recite the whole prayer.</p>`:""}
   </footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>`;
@@ -67,6 +75,11 @@ const view=document.getElementById("view");
 
 // Progress: one badge per exercise, kept in localStorage alongside the rest.
 let done=store.get("done",{});
+// Sectioned prayers: steps 1–4 done per part, kept in <key>-partdone as [{study:true,…},…]. A step goes into done once all parts have it.
+let part=Math.min(Math.max(+store.get("part",0)||0,0),PARTS?PARTS.length-1:0);
+const partdone=PARTS?PARTS.map((_,i)=>(store.get("partdone",[])||[])[i]||{}):null;
+const inPart=step=>PARTS&&step!=="recall";
+const isDone=step=>inPart(step)?!!partdone[part][step]||!!done[step]:!!done[step];
 function drawProgress(){
   const n=STEPS.filter(s=>done[s]).length;
   document.getElementById("pathlabel").textContent=n===5?"All 5 steps complete":`${n} of 5 steps`;
@@ -85,10 +98,25 @@ function burst(){
     document.body.appendChild(e);setTimeout(()=>e.remove(),1200);}
 }
 function complete(step){
+  if(inPart(step)&&!done[step]){
+    if(partdone[part][step])return;
+    partdone[part][step]=true;store.set("partdone",partdone);drawParts();
+    if(partdone.some(d=>!d[step])){burst();
+      const k=partdone.filter(d=>d[step]).length;
+      toast(`<b>✓</b> Part ${ROMAN[part]}: step ${STEPS.indexOf(step)+1} done · ${k} of ${PARTS.length} parts`);return;}
+  }
   if(done[step])return;
   done[step]=true;store.set("done",done);drawProgress();burst();
   const n=STEPS.filter(s=>done[s]).length;
   toast(n===5?`<b>✦</b> All five steps complete. It's now in Review on the home page.`:`<b>✓</b> Step ${STEPS.indexOf(step)+1} complete · ${n} of 5`);
+}
+
+function drawParts(){
+  const el=document.getElementById("parts");el.hidden=!PARTS||mode==="recall";if(el.hidden)return;
+  el.innerHTML=`<span class="parts-l">Part</span><div class="seg" role="group" aria-label="Part to study">${PARTS.map((p,i)=>{
+    const ok=STEPS.slice(0,4).every(s=>partdone[i][s]||done[s]);
+    return `<button type="button" data-part="${i}" aria-pressed="${i===part}">${ROMAN[i]}. ${esc(p.name)}${ok?" ✓":""}</button>`;}).join("")}</div>`;
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>{if(+b.dataset.part===part)return;part=+b.dataset.part;store.set("part",part);go(mode);});
 }
 
 function prayerHTML(fn,a=0,b=WORDS.length){ // fn(word,globalIndex) -> html; only lines starting in [a,b) are shown
@@ -116,13 +144,13 @@ const MODES={
     pool:[...MOVES.map((m,i)=>({name:m.name,real:i})),...DECOYS.map(d=>({name:d,real:-1}))].sort(()=>Math.random()-.5)};draw();};
   const quizHTML=()=>{
    const intro=`<h3 class="qh">Test yourself: order the movements</h3>
-     <p class="hint">This prayer has <strong>${NUM} movements</strong>, but there are ${MOVES.length+DECOYS.length} cards below. Some aren't part of this prayer. Tap the ${NUM} that are, in order.</p>`;
+     <p class="hint">${PARTS?`Part ${ROMAN[part]}`:"This prayer"} has <strong>${NUM} movements</strong>, but there are ${MOVES.length+DECOYS.length} cards below. Some aren't part of ${PARTS?"it":"this prayer"}. Tap the ${NUM} that are, in order.</p>`;
    if(!quiz)return `<div class="card quiz">${intro}
-     <div class="row">${done.study?`<span class="done">✓ You've put the movements in order.</span>`:""}
-      <button class="btn gold" id="qstart">${done.study?"Practice again":"Start (hides the movements)"}</button></div></div>`;
+     <div class="row">${isDone("study")?`<span class="done">✓ You've put the movements in order.</span>`:""}
+      <button class="btn gold" id="qstart">${isDone("study")?"Practice again":"Start (hides the movements)"}</button></div></div>`;
    const fin=quiz.next===MOVES.length;
    return `<div class="card quiz">${intro}
-     <div>${quiz.placed.length?quiz.placed.map(i=>`<p class="placed"><span class="mark">${ROMAN[i]}</span>${esc(MOVES[i].name)}</p>`).join(""):`<p class="hint">Movement I goes here.</p>`}</div>
+     <div>${quiz.placed.length?quiz.placed.map(i=>`<p class="placed"><span class="mark">${ROMAN[i+OFF]}</span>${esc(MOVES[i].name)}</p>`).join(""):`<p class="hint">Movement ${ROMAN[OFF]} goes here.</p>`}</div>
      ${fin?`<p class="done">${MOVES.length===2?"Both":"All "+NUM} movements in order.</p>`:`<div class="pool">${quiz.pool.map((c,k)=>c.placed?"":`<button class="chip${c.decoy?" decoy":""}" data-k="${k}"${c.decoy?" disabled":""}>${esc(c.name)}</button>`).join("")}</div>`}
      <p class="qmsg" role="status">${quiz.msg}</p>
      <div class="row">${fin?`<button class="btn" id="qclose">Show the movements</button><button class="btn" id="qstart">Practice again</button>`
@@ -133,7 +161,7 @@ const MODES={
     <div class="card about"><span class="ic">✦</span><div>${P.about.map(p=>`<p>${p}</p>`).join("")}</div></div>
     ${quiz?"":`<div class="row" style="justify-content:space-between"><p class="hint" style="flex:1;min-width:200px">${NUM[0].toUpperCase()+NUM.slice(1)} movements. Learn their names and hooks first; the words hang on them.</p>
      <button class="btn" id="latin" aria-pressed="${latin}">${latin?"Hide Latin":"Show Latin"}</button></div>
-    <div class="card">${MOVES.map((m,i)=>`<div class="mv"><div class="n">${ROMAN[i]}</div>
+    <div class="card">${MOVES.map((m,i)=>`<div class="mv"><div class="n">${ROMAN[i+OFF]}</div>
       <div style="min-width:0"><h3>${m.name}</h3><div class="t${m.vr?" vr":""}">${m.lines.map(esc).join("<br>")}</div>
       ${latin?`<div class="la">${m.latin.map(esc).join("<br>")}</div>`:""}</div>
       <p class="hook">${m.hook}</p></div>`).join("")}</div>`}
@@ -160,7 +188,9 @@ const MODES={
   const labels=["Full text","A few gaps","About 40% hidden","About 60% hidden","Most hidden","All hidden"];
   // Hiding order, fixed for this visit so each level hides everything the level below did:
   // words missed in Recite first, then the rest, each group shuffled. "New pattern" reshuffles.
-  const missed=[...new Set(store.get("missed",[]))].filter(i=>Number.isInteger(i)&&i>=0&&i<WORDS.length);
+  // Missed words are stored as indices into the whole prayer; shift them into the current part.
+  const w0=ALL.slice(0,OFF).flatMap(m=>m.lines).join(" ").split(/\s+/).filter(Boolean).length;
+  const missed=[...new Set(store.get("missed",[]))].map(i=>i-w0).filter(i=>Number.isInteger(i)&&i>=0&&i<WORDS.length);
   let rank;
   const reshuffle=()=>{const ms=new Set(missed);rank=[];
     [...shuffle(missed),...shuffle(WORDS.map((_,i)=>i).filter(i=>!ms.has(i)))].forEach((w,r)=>rank[w]=r);};
@@ -188,7 +218,7 @@ const MODES={
    <p class="hint">Only the first letter of each word remains, with punctuation as a guide to the rhythm. Recite the whole prayer; tap a letter if you're stuck.</p>
    ${prayerHTML(w=>{const m=w.match(/^([^A-Za-z]*)([A-Za-z])[A-Za-z']*(.*)$/);const c=m?m[1]+m[2]+m[3]:w;
      return `<span class="w cue" data-w="${esc(w)}" data-c="${esc(c)}">${esc(c)}</span>`;})}
-   <div class="row"><button class="btn gold" id="recited">${done.cues?"✓ Recited from initials":"I recited it from the initials"}</button></div></div>`;
+   <div class="row"><button class="btn gold" id="recited">${isDone("cues")?"✓ Recited from initials":"I recited it from the initials"}</button></div></div>`;
   bindPeek();
   document.getElementById("recited").onclick=e=>{complete("cues");e.target.textContent="✓ Recited from initials";};
  },
@@ -199,12 +229,13 @@ const MODES={
   const INFO=MOVES.flatMap(m=>m.lines.map((l,li)=>({l,name:m.name,vr:!!m.vr,mark:m.vr?(li===0?"℣":"℟"):""})));
   const lineHTML=i=>`${INFO[i].mark?`<span class="mark">${INFO[i].mark}</span>`:""}${esc(INFO[i].l)}`;
   let shuffled=store.get("nextmode","inorder")==="shuffled",s;
+  const ndKey=PARTS?"nextdone-"+part:"nextdone";
   const start=()=>{const q=LINES.map((_,i)=>i);if(shuffled)q.sort(()=>Math.random()-.5);
     s={queue:q,got:new Set(),missed:new Set(),shown:false};draw();};
   const reveal=()=>{s.shown=true;draw();};
   const mark=ok=>{const i=s.queue.shift();
     if(ok)s.got.add(i);else{s.missed.add(i);s.queue.splice(Math.min(3,s.queue.length),0,i);}
-    if(!s.queue.length){const nd=store.get("nextdone",{});nd[shuffled?"shuffled":"inorder"]=true;store.set("nextdone",nd);}
+    if(!s.queue.length){const nd=store.get(ndKey,{});nd[shuffled?"shuffled":"inorder"]=true;store.set(ndKey,nd);}
     s.shown=false;draw();if(!s.queue.length)complete("order");};
   const draw=()=>{
    const n=LINES.length,i=s.queue[0],fin=i===undefined;
@@ -215,7 +246,7 @@ const MODES={
      <div class="row"><button class="btn primary" id="again">Go again</button></div></div>`
     :`<div class="card nl">
      <h3 class="qh">${esc(INFO[i].name)}</h3>
-     <p class="nl-cue${i&&INFO[i-1].vr?" vr":""}">${i?lineHTML(i-1):`<span class="nl-start">(Start of the prayer)</span> ${esc(P.title)}`}</p>
+     <p class="nl-cue${i&&INFO[i-1].vr||!i&&PREV&&ALL[OFF-1].vr?" vr":""}">${i?lineHTML(i-1):PREV?esc(PREV):`<span class="nl-start">(Start of the prayer)</span> ${esc(P.title)}`}</p>
      <div class="nl-target${s.shown?" shown":""}${s.shown&&INFO[i].vr?" vr":""}" aria-live="polite">${s.shown?lineHTML(i):"Say the next line aloud, then reveal it."}</div>
      <div class="row">${s.shown?`<button class="btn ok" id="got">Got it</button><button class="btn" id="miss">Missed it</button>`
        :`<button class="btn primary" id="reveal">Reveal</button>`}</div>
@@ -233,7 +264,7 @@ const MODES={
    if($("miss"))$("miss").onclick=()=>mark(false);
    if($("again"))$("again").onclick=start;
    // Next: the first round not yet finished (In order, then Shuffled), then Recite. If that's the round you're in, the one after it.
-   const nd=store.get("nextdone",{}),cur=shuffled?"shuffled":"inorder",ST=["inorder","shuffled","recall"];
+   const nd=store.get(ndKey,{}),cur=shuffled?"shuffled":"inorder",ST=["inorder","shuffled","recall"];
    let t=ST.find(x=>x==="recall"||!nd[x]);if(t===cur)t=ST[ST.indexOf(cur)+1];
    nextAction=t==="recall"?null:{label:`Next: ${t==="inorder"?"In order":"Shuffled"}`,
      fn:()=>{shuffled=t==="shuffled";store.set("nextmode",t);start();scrollToEl(view);}};
@@ -248,19 +279,28 @@ const MODES={
   start();
  },
  // Recite: say the whole prayer aloud from memory; nothing is typed. Show prayer reveals the words to check yourself.
+ // Show hints picks a hint at random, the initials or the movements, and toggles to Hide hints.
+ // Show prayer toggles to Hide prayer, which clears the hint too, leaving the box blank. While the prayer shows, Show hints swaps it for a new hint.
  recall(){
-  let shown=false,said=false;
+  let shown=false,said=false,hint=null; // hint: null, "initials" or "movements"
+  const HINTS={
+   initials:()=>`<p class="qh">Hint: the initials</p>${prayerHTML(w=>{const m=w.match(/^([^A-Za-z]*)([A-Za-z])[A-Za-z']*(.*)$/);const c=m?m[1]+m[2]+m[3]:w;
+     return `<span class="w cue" data-w="${esc(w)}" data-c="${esc(c)}">${esc(c)}</span>`;})}`,
+   movements:()=>`<p class="qh">Hint: the movements</p><div class="card">${MOVES.map((m,i)=>`<div class="mv"><div class="n">${ROMAN[i]}</div>
+     <div style="min-width:0"><h3>${esc(m.name)}</h3><p class="hook">${esc(m.desc||"")}</p></div></div>`).join("")}</div>`
+  };
+  const toggleHint=()=>{hint=hint&&!shown?null:Math.random()<.5?"initials":"movements";shown=false;draw();};
   const draw=()=>{
   view.innerHTML=`<div style="display:flex;flex-direction:column;gap:12px">
-   <p class="aloud">Say the whole prayer aloud from memory. When you've finished, show the prayer and check yourself.</p>
-   <div aria-live="polite">${shown?prayerHTML(esc):""}</div>
-   <div class="row">${shown
-     ?`<button class="btn ok" id="said">${said||done.recall?"✓ Said it from memory":"I said it correctly"}</button><button class="btn" id="again">Say it again</button>`
-     :`<button class="btn primary" id="show">Show prayer</button>`}</div></div>`;
+   <p class="aloud">Say the whole prayer aloud from memory. Stuck? Show hints. When you've finished, show the prayer and check yourself.</p>
+   <div aria-live="polite" style="display:flex;flex-direction:column;gap:8px">${shown?prayerHTML(esc):hint?HINTS[hint]():""}</div>
+   <div class="row"><button class="btn" id="hint" aria-pressed="${!!hint&&!shown}">${hint&&!shown?"Hide hints":"Show hints"}</button><button class="btn primary" id="show" aria-pressed="${shown}">${shown?"Hide prayer":"Show prayer"}</button>
+    <button class="btn ok" id="said">${said||done.recall?"✓ Said it from memory":"I said it correctly"}</button></div></div>`;
   const $=id=>document.getElementById(id);
-  if($("show"))$("show").onclick=()=>{shown=true;draw();};
-  if($("said"))$("said").onclick=()=>{said=true;complete("recall");draw();};
-  if($("again"))$("again").onclick=()=>{shown=false;said=false;draw();};
+  bindPeek();
+  $("hint").onclick=toggleHint;
+  $("show").onclick=()=>{if(shown)hint=null;shown=!shown;draw();};
+  $("said").onclick=()=>{said=true;complete("recall");draw();};
   };draw();
  }
 };
@@ -281,6 +321,13 @@ function drawNext(m){
     document.getElementById("nextstep").onclick=nextAction.fn;
     return;
   }
+  // Sectioned prayer, last part step: on to the next part that still has steps to do, before Recite.
+  const np=PARTS&&m==="order"?[...PARTS.keys()].map(d=>(part+1+d)%PARTS.length).find(i=>i!==part&&STEPS.slice(0,4).some(s=>!partdone[i][s]&&!done[s])):undefined;
+  if(np!==undefined){
+    el.innerHTML=`<button class="btn primary" id="nextstep">Next: Part ${ROMAN[np]} · Study →</button>`;
+    document.getElementById("nextstep").onclick=()=>{part=np;store.set("part",part);go("study");scrollToEl(document.getElementById("parts"));};
+    return;
+  }
   if(k<STEPS.length-1){
     el.innerHTML=`<button class="btn primary" id="nextstep">Next step: ${esc(TAB_NAMES[STEPS[k+1]])} →</button>`;
     document.getElementById("nextstep").onclick=()=>{go(STEPS[k+1]);scrollToEl(document.getElementById("tabs"));};
@@ -290,7 +337,8 @@ function drawNext(m){
 }
 function go(m){mode=m;store.set("mode",m);onKey=null;nextAction=null;
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));
-  MODES[m]();drawNext(m);}
+  if(inPart(m))scopeTo(PARTS[part].from,PARTS[part].to);else scopeTo(0,ALL.length);
+  drawParts();MODES[m]();drawNext(m);}
 document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>go(b.dataset.m));
 drawProgress();
 // "#recite" (from the home page's Review list) opens straight to Recite.

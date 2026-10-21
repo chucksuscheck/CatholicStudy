@@ -131,6 +131,10 @@ a.btn{text-decoration:none;display:inline-block}
 .qmsg{margin:0;min-height:1.4em;font-size:14.5px;color:var(--miss)}
 
 /* Next line */
+.parts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:-4px}
+.parts[hidden]{display:none}
+.parts-l{font:700 12px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+.parts .seg{flex-wrap:wrap}
 .seg{display:flex;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
 .seg button{font:600 13.5px var(--sans);border:0;background:transparent;color:var(--muted);padding:9px 12px;border-radius:7px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--card)}

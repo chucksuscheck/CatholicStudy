@@ -4,7 +4,7 @@ A small static site for studying Catholic concepts and memorizing prayers.
 
 ## Structure
 
-- `index.html` — home page listing all exercises
+- `index.html` — home page listing all prayers
 - `prayers/` — prayer memorization pages. Each page only defines `window.PRAYER` (text, Latin, hooks); `practice.js` and `practice.css` build the exercises
 - `shared/emblems.js` — gold emblems used on prayer headers and home-page cards
 - `shared/prayers.js` — the list of prayer pages in Most Common order; the home page cards and each prayer page's header description come from it
@@ -16,7 +16,8 @@ To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER`
 ## Exercises and review
 
 Each prayer has five steps: Study, Fade, Initials, Next line (cued recall: say the line that follows a cue) and Recite.
-Recite is said aloud, not typed: say the whole prayer from memory, then Show prayer to check yourself and mark it said correctly to complete the step.
+A long prayer can be split into parts (`parts` in its `window.PRAYER`; the Nicene Creed has three): steps 1–4 are done one part at a time and count once every part has done them, and Recite is always the whole prayer.
+Recite is said aloud, not typed: say the whole prayer from memory (Show hints gives the initials or the movements, picked at random, and toggles to Hide hints), then Show prayer to check yourself and mark it said correctly to complete the step.
 Once all five steps are done, the prayer appears in the home page's Review list, which opens straight to Recite. The list is ordered by the best recital score from the old typed Recite (lowest first); spoken recitals aren't scored.
 
 ## Priority order
