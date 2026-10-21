@@ -1,6 +1,6 @@
 // Shared memory-practice engine. Each prayer page defines window.PRAYER, then loads shared/prayers.js and this script:
 //   key          localStorage prefix, e.g. "hhq" (the home page reads <key>-done and <key>-best)
-//   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js), heroPos (CSS background-position)
+//   title, eyebrow, incipit (opening Latin words), emblem (a kind in shared/emblems.js)
 //   about        array of HTML paragraphs shown at the top of Study
 //   placeholder  hint text for the Recite box
 //   moves        [{name, desc (what it says, without the prayer's words; the Recite hint), hook (HTML), lines:[...], latin:[...], vr (true for a versicle & response)}]
@@ -34,7 +34,7 @@ const CARD=(window.PRAYERS||[]).find(p=>p.key===P.key);
 const DESC=CARD&&window.prayerNote?window.prayerNote(CARD,CARD.why):"";
 document.body.innerHTML=`<div class="wrap">
   <a class="home" href="../index.html">← All prayers</a>
-  <header><a class="hero" href="../index.html" title="Back to all prayers" style="--hero-pos:${P.heroPos||"70% 72%"}">
+  <header><a class="hero" href="../index.html" title="Back to all prayers">
     <div style="position:relative;z-index:1;min-width:0">
       <span class="eyebrow">${P.eyebrow} · Memory practice</span>
       <h1>${P.title}</h1>
