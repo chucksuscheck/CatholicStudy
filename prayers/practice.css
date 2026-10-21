@@ -25,7 +25,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font
 .home:hover{text-decoration:underline}
 
 .hero{position:relative;overflow:hidden;border-radius:18px;padding:22px 20px 30px;color:#FFF8E6;
-  background:url("../images/zund-road-to-emmaus.jpg") 20% 70%/cover no-repeat,var(--accent-deep);
+  /* Fixed size and offset, not cover: banners differ in height (longer text wraps), and cover would show each a different slice.
+     At 620px wide the painting is 442px tall; 181px down is the Our Father's old view, leaving 260px, taller than any banner. */
+  background:url("../images/zund-road-to-emmaus.jpg") 20% -181px/max(100%,620px) auto no-repeat,var(--accent-deep);
   display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;box-shadow:0 10px 30px rgba(31,43,18,.18)}
 a.hero{text-decoration:none;transition:transform .15s,box-shadow .15s}
 @media (hover:hover){a.hero:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(31,43,18,.28)}}
