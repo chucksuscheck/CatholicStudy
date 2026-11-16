@@ -10,7 +10,8 @@ window.PRAYERS=[
  {href:"prayers/apostles-creed.html",key:"apc",rosary:true,priority:6,why:"The Church’s ancient baptismal creed",emblem:"apostles",title:"The Apostles’ Creed",latin:"Symbolum Apostolorum",d:"The faith of the Apostles"},
  {href:"prayers/nicene-creed.html",key:"nic",priority:7,why:"Said at every Sunday Mass, but it’s the longest, so learn it after the shorter prayers",emblem:"nicene",title:"The Nicene Creed",latin:"Symbolum Nicænum",d:"The creed professed at Sunday Mass"},
  {href:"prayers/hail-holy-queen.html",key:"hhq",rosary:true,priority:8,why:"Sung at Night Prayer for much of the year",emblem:"marian",title:"Hail, Holy Queen",latin:"Salve Regina",d:"An ancient Marian antiphon"},
- {href:"prayers/memorare.html",key:"mem",priority:9,why:"A traditional devotion, not part of the Mass",emblem:"rose",title:"The Memorare",latin:"Memorare",d:"A prayer of confident trust in Mary"}
+ {href:"prayers/memorare.html",key:"mem",priority:9,why:"A traditional devotion, not part of the Mass",emblem:"rose",title:"The Memorare",latin:"Memorare",d:"A prayer of confident trust in Mary"},
+ {href:"prayers/st-michael.html",key:"stm",priority:10,why:"Said after Mass in many parishes",emblem:"sword",title:"Prayer to Saint Michael",latin:"Sancte Michael",d:"A plea to the archangel for protection from evil"}
 ];
 // A card's description: the given text plus the Rosary note where it applies. Also used as the prayer page's header line.
 window.prayerNote=(p,text)=>text+(p.rosary?"; also included in the Rosary":"");

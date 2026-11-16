@@ -39,6 +39,11 @@
     keys:()=>ring((x,y,a)=>`<path ${a} d="M${x},${y-3.5}L${x+3},${y}L${x},${y+3.5}L${x-3},${y}Z" fill="none" stroke="${GOLD}" stroke-width="1.5"/>`)+halo+
       [35,-35].map(r=>`<g transform="rotate(${r})" fill="none" stroke="${r>0?LIGHT:GOLD}" stroke-width="2.2" stroke-linecap="round">
        <circle cy="-13" r="5"/><path d="M0,-8V18"/><path d="${r>0?"M0,12H5M0,16H5":"M0,12H-5M0,16H-5"}"/></g>`).join(""),
+    // Prayer to Saint Michael: the archangel's sword, ringed by the sparkles of the heavenly hosts.
+    sword:()=>ring((x,y,a)=>`<path ${a} fill="${GOLD}" d="M${x},${y-4.5}Q${x},${y} ${x+4.5},${y}Q${x},${y} ${x},${y+4.5}Q${x},${y} ${x-4.5},${y}Q${x},${y} ${x},${y-4.5}Z"/>`)+halo+
+      `<path d="M0,-19L3.2,-14V6H-3.2V-14Z" fill="none" stroke="${LIGHT}" stroke-width="2" stroke-linejoin="round"/>
+       <path d="M-10,6H10" stroke="${LIGHT}" stroke-width="2.6" stroke-linecap="round"/>
+       <path d="M0,7V14" stroke="${GOLD}" stroke-width="3" stroke-linecap="round"/><circle cy="16.5" r="2.6" fill="${GOLD}"/>`,
     // Our Father: the Chi-Rho, monogram of Christ who taught the prayer.
     paternoster:()=>ring((x,y,a)=>`<path ${a} fill="${GOLD}" d="M${x},${y-4}L${x+3},${y}L${x},${y+4}L${x-3},${y}Z"/>`)+halo+
       `<g fill="none" stroke="${LIGHT}" stroke-width="2.6" stroke-linecap="round"><path d="M0,-17V18"/><path d="M0,-17H4.5A6,6 0 0 1 4.5,-5H0"/><path d="M-10,-1L10,13M10,-1L-10,13"/></g>`

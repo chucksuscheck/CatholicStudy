@@ -35,6 +35,7 @@ Ranked by how often you'll use them:
 | 7 | Nicene Creed | `nicene-creed.html` | Said at every Sunday Mass, but it's the longest, so learn it after the shorter prayers |
 | 8 | Hail, Holy Queen | `hail-holy-queen.html` | Sung at Night Prayer for much of the year; also included in the Rosary |
 | 9 | Memorare | `memorare.html` | A traditional devotion, not part of the Mass |
+| 10 | Prayer to Saint Michael | `st-michael.html` | Said after Mass in many parishes |
 
 ## Running locally
 
