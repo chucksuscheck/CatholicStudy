@@ -6,8 +6,8 @@ A small static site for studying Catholic concepts and memorizing prayers.
 
 The site has four sections, reached from the menu bar at the top of every page: Prayers, Rosary, Mass and (Salvation) History.
 
-- `index.html` — home page: the painting, then how memorization works (the five steps and tips); sections are reached from the menu
-- `prayers/` — the Prayers section. `prayers/index.html` lists every prayer with the Review list; each other page only defines `window.PRAYER` (text, Latin, hooks), and `practice.js` and `practice.css` build the exercises
+- `index.html` — home page: the painting and why learn by heart; sections are reached from the menu
+- `prayers/` — the Prayers section. `prayers/index.html` has the Review list and every prayer, then how to memorize (the five steps and what helps) at the bottom; each other page only defines `window.PRAYER` (text, Latin, hooks), and `practice.js` and `practice.css` build the exercises
 - `rosary/` — the Rosary section: three pages with a Prayers · Mechanics · Mysteries tab row under the banner. There's no `index.html`; the menu opens `prayers.html`, and `vercel.json` redirects `/rosary/` there:
   - `prayers.html` — the six prayers of the Rosary in the order they first come (cards link to the practice pages in `prayers/`)
   - `mechanics.html` — the whole Rosary in order, with a Put in order drill for the Opening, Each decade and the Closing (tap the prayer that comes next; shown first) and a Study view showing the same cards filled in

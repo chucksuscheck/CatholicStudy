@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="shared/site.css">
 <style>
-/* Home page: the painting is the hero, then how memorization works here. Sections are reached from the menu (shared/nav.js).
+/* Home page: the painting is the hero, then why learn by heart. Sections are reached from the menu (shared/nav.js).
    Shared styles are in shared/site.css. */
 .hero{margin:0;border-radius:20px;overflow:hidden;background:var(--accent-deep);box-shadow:0 10px 30px rgba(31,43,18,.18)}
 .hero .art{position:relative;aspect-ratio:640/456;max-height:440px;width:100%;
@@ -37,19 +37,6 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,48px);lin
 .hero figcaption cite{font-style:italic;color:#A8A487}
 @media (max-width:440px){.hero .art{aspect-ratio:4/5;background-position:62% 60%}}
 
-/* About memorization */
-.lead{margin:0;font:400 clamp(17px,4.2vw,19px)/1.55 var(--serif);color:var(--ink)}
-.lead + .lead{margin-top:12px}
-.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-.steps li{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.steps .n{grid-row:span 2;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:var(--card);font:600 16px var(--serif)}
-.steps b{font:500 19px/1.3 var(--serif);color:var(--accent)}
-.steps span{font-size:15px;color:var(--muted)}
-.tips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-@media (max-width:560px){.tips{grid-template-columns:1fr}}
-.tip{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-.tip h3{margin:0 0 4px;font:500 18px/1.3 var(--serif);color:var(--accent)}
-.tip p{margin:0;font-size:15px;color:var(--muted)}
 .start{margin:0;font-size:15.5px;background:var(--accent-soft);border-radius:12px;padding:14px 16px}
 .start strong{color:var(--accent)}
 </style>
@@ -72,30 +59,6 @@ h1{font-family:var(--serif);font-weight:500;font-size:clamp(32px,8.5vw,48px);lin
   <section>
     <div class="sec-h"><h2>Learning by heart</h2></div>
     <p class="lead">Words you know by heart go everywhere with you: at Mass, at a bedside, in the car, in the middle of the night. You don’t need a book or a screen to pray them, and in time they stop being something you recite and become something you mean.</p>
-    <p class="lead">Memorizing isn’t a talent. It’s a handful of habits, done a few minutes at a time. Every practice page on this site walks you through the same five steps.</p>
-  </section>
-
-  <section>
-    <div class="sec-h"><h2>The five steps</h2></div>
-    <ol class="steps">
-      <li><span class="n">1</span><b>Study</b><span>Read the text in its movements, the few short sections it falls into, each with a name and a hook. Learn the shape first; the words hang on it.</span></li>
-      <li><span class="n">2</span><b>Fade</b><span>Read it aloud while more and more of the words disappear, until you’re supplying most of them yourself.</span></li>
-      <li><span class="n">3</span><b>Initials</b><span>Only the first letter of each word is left. Say each line from those letters alone.</span></li>
-      <li><span class="n">4</span><b>Next line</b><span>You’re shown one line and say the line that follows. This is how you’ll actually remember it: one line leading to the next.</span></li>
-      <li><span class="n">5</span><b>Recite</b><span>Say the whole thing from memory, then check yourself against the text.</span></li>
-    </ol>
-  </section>
-
-  <section>
-    <div class="sec-h"><h2>What helps</h2></div>
-    <div class="tips">
-      <div class="tip"><h3>Say it out loud</h3><p>Words you speak are remembered better than words you read silently. Whisper if you have to, but use your voice.</p></div>
-      <div class="tip"><h3>A little, often</h3><p>Ten minutes on each of several days does more than an hour in one sitting. Stop while it still feels easy.</p></div>
-      <div class="tip"><h3>Recall, don’t reread</h3><p>Trying to bring the words back, even when it’s hard, is what makes them stick. Rereading only feels like progress.</p></div>
-      <div class="tip"><h3>Sleep on it</h3><p>Memory settles overnight. If a line won’t come today, it often will tomorrow.</p></div>
-      <div class="tip"><h3>Come back to review</h3><p>Once you’ve learned something, recite it again a few days later, then a week later. Each review makes it last longer.</p></div>
-      <div class="tip"><h3>Pray it, don’t just say it</h3><p>Think about what the words mean as you say them. Meaning is the strongest hook of all.</p></div>
-    </div>
   </section>
 
   <p class="start"><strong>Ready to begin?</strong> Choose a section from the menu at the top of the page. Your progress is saved as you go.</p>
