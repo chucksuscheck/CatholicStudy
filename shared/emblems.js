@@ -46,7 +46,23 @@
        <path d="M0,7V14" stroke="${GOLD}" stroke-width="3" stroke-linecap="round"/><circle cy="16.5" r="2.6" fill="${GOLD}"/>`,
     // Our Father: the Chi-Rho, monogram of Christ who taught the prayer.
     paternoster:()=>ring((x,y,a)=>`<path ${a} fill="${GOLD}" d="M${x},${y-4}L${x+3},${y}L${x},${y+4}L${x-3},${y}Z"/>`)+halo+
-      `<g fill="none" stroke="${LIGHT}" stroke-width="2.6" stroke-linecap="round"><path d="M0,-17V18"/><path d="M0,-17H4.5A6,6 0 0 1 4.5,-5H0"/><path d="M-10,-1L10,13M10,-1L-10,13"/></g>`
+      `<g fill="none" stroke="${LIGHT}" stroke-width="2.6" stroke-linecap="round"><path d="M0,-17V18"/><path d="M0,-17H4.5A6,6 0 0 1 4.5,-5H0"/><path d="M-10,-1L10,13M10,-1L-10,13"/></g>`,
+
+    // Section emblems (home hub and section pages).
+    // Rosary: a ring of beads, with the centerpiece medal and crucifix.
+    beads:()=>ring((x,y,a)=>`<circle ${a} cx="${x}" cy="${y}" r="3.2" fill="${GOLD}"/>`)+halo+
+      `<circle cy="-11" r="5" fill="none" stroke="${GOLD}" stroke-width="2"/>
+       <path d="M0,-6V19M-7.5,3H7.5" stroke="${LIGHT}" stroke-width="3" stroke-linecap="round"/>`,
+    // Mass: the chalice with the host above it.
+    chalice:()=>ring((x,y,a)=>`<circle ${a} cx="${x}" cy="${y}" r="2.2" fill="${GOLD}"/>`)+halo+
+      `<circle cy="-12" r="6.5" fill="none" stroke="${GOLD}" stroke-width="2"/><path d="M0,-15.5V-8.5M-3.5,-12H3.5" stroke="${GOLD}" stroke-width="1.6" stroke-linecap="round"/>
+       <g fill="none" stroke="${LIGHT}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+       <path d="M-11,-3H11C11,6 5,9 0,9C-5,9 -11,6 -11,-3Z"/><path d="M0,9V16"/><path d="M-7.5,17.5H7.5"/></g>`,
+    // Salvation History: the open Scriptures, ringed by stars (Gen 15:5, Abraham's descendants).
+    book:()=>ring((x,y,a)=>`<path ${a} fill="${GOLD}" d="${star(x,y,4)}"/>`)+halo+
+      `<g fill="none" stroke="${LIGHT}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+       <path d="M0,-9C-5,-13 -11,-13 -16,-11V12C-11,10 -5,10 0,14C5,10 11,10 16,12V-11C11,-13 5,-13 0,-9Z"/><path d="M0,-9V14"/>
+       <path d="M-12,-5C-9,-6 -6,-6 -4,-5M-12,0C-9,-1 -6,-1 -4,0M4,-5C6,-6 9,-6 12,-5M4,0C6,-1 9,-1 12,0" stroke-width="1.4"/></g>`
   };
 
   window.drawEmblem=(svg,kind)=>{

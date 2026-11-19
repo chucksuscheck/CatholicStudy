@@ -1,0 +1,7 @@
+{
+  "redirects": [
+    { "source": "/rosary", "destination": "/rosary/prayers.html", "permanent": false },
+    { "source": "/rosary/", "destination": "/rosary/prayers.html", "permanent": false },
+    { "source": "/rosary/index.html", "destination": "/rosary/prayers.html", "permanent": false }
+  ]
+}

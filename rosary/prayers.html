@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prayers of the Rosary · Faith by Heart</title>
+<meta name="description" content="The six prayers of the Rosary, in the order to learn them.">
+<meta name="application-name" content="Faith by Heart">
+<meta name="apple-mobile-web-app-title" content="Faith by Heart">
+<meta property="og:site_name" content="Faith by Heart">
+<meta property="og:title" content="Prayers of the Rosary · Faith by Heart">
+<meta property="og:description" content="The six prayers of the Rosary, in the order to learn them.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#3F5A26">
+<link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="../images/apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../shared/site.css">
+<link rel="stylesheet" href="rosary.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="page-h">
+    <div>
+      <span class="eyebrow">The Holy Rosary · Prayers</span>
+      <h1>Prayers of the Rosary</h1>
+      <p>The six prayers of the Rosary, in the order they first come.</p>
+    </div>
+    <svg viewBox="-50 -50 100 100" aria-hidden="true" data-emblem="lily"></svg>
+  </header>
+  <nav class="subnav" aria-label="Rosary"><a href="prayers.html" aria-current="page">Prayers</a><a href="mechanics.html">Mechanics</a><a href="mysteries.html">Mysteries</a></nav>
+
+  <p class="aloud"><strong>Start here:</strong> the Rosary is built from six prayers. Learn them in the order below, the order they first come when you pray it, and you’ll know every word of the Rosary.</p>
+
+  <section>
+    <div class="sec-h"><h2>Learn the prayers</h2></div>
+    <p class="summary" id="summary"></p>
+    <div class="list" id="prayers"></div>
+  </section>
+
+  <footer><span>Progress is saved in your browser on this device.</span><span>✦ Ora pro nobis</span></footer>
+</div>
+<script src="../shared/emblems.js"></script>
+<script src="../shared/prayers.js"></script>
+<script src="../shared/cards.js"></script>
+<script src="rosary.js"></script>
+<script>
+const {BY,url,LEARN,SEQ,DRILLS,store}=window.ROSARY, esc=window.esc;
+document.querySelectorAll("svg[data-emblem]").forEach(s=>window.drawEmblem(s,s.dataset.emblem));
+document.getElementById("prayers").replaceChildren(...LEARN.map(([k,desc],i)=>
+  window.prayerCard(BY[k],{href:url(BY[k]),desc,rank:i+1,rankLabel:`Learn number ${i+1}`})));
+const learned=window.ROSARY.prayersLearned();
+document.getElementById("summary").textContent=learned===LEARN.length?"You know all six prayers of the Rosary. ✦"
+  :`${learned} of ${LEARN.length} learned. A prayer counts as learned once you finish all five steps.`;
+</script>
+<script src="../shared/nav.js"></script>
+</body>
+</html>

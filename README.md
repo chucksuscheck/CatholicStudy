@@ -4,15 +4,31 @@ A small static site for studying Catholic concepts and memorizing prayers.
 
 ## Structure
 
-- `index.html` — home page listing all prayers
-- `prayers/` — prayer memorization pages. Each page only defines `window.PRAYER` (text, Latin, hooks); `practice.js` and `practice.css` build the exercises
-- `shared/emblems.js` — gold emblems used on prayer headers and home-page cards
-- `shared/prayers.js` — the list of prayer pages in Most Common order; the home page cards and each prayer page's header description come from it
-- `game/` — gamified version (in progress; not linked from the home page yet)
-- `images/` — Robert Zünd, *The Road to Emmaus* (1877), public domain via Wikimedia Commons; also the site icon (`favicon.svg`, `apple-touch-icon.png`; `favicon.ico` sits at the root)
-- `404.html` — the page shown for any missing address
+The site has four sections, reached from the menu bar at the top of every page: Prayers, Rosary, Mass and (Salvation) History.
 
-To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER` data (give it a new `key`), and add it to `shared/prayers.js` with a `priority` and a short `why` (the home page can sort by Most Common or A–Z).
+- `index.html` — home page: the painting, then how memorization works (the five steps and tips); sections are reached from the menu
+- `prayers/` — the Prayers section. `prayers/index.html` lists every prayer with the Review list; each other page only defines `window.PRAYER` (text, Latin, hooks), and `practice.js` and `practice.css` build the exercises
+- `rosary/` — the Rosary section: three pages with a Prayers · Mechanics · Mysteries tab row under the banner. There's no `index.html`; the menu opens `prayers.html`, and `vercel.json` redirects `/rosary/` there:
+  - `prayers.html` — the six prayers of the Rosary in the order they first come (cards link to the practice pages in `prayers/`)
+  - `mechanics.html` — the whole Rosary in order, with a Put in order drill for the Opening, Each decade and the Closing (tap the prayer that comes next; shown first) and a Study view showing the same cards filled in
+  - `mysteries.html` — the four sets of mysteries, with a Put in order drill for each set (shown first) and a Study view showing them filled in
+  - Which prayers belong to the Rosary, their learning order and when each is said come from the `rosary` entry on each prayer in `shared/prayers.js`; to add or change a Rosary prayer, edit it there
+  - `rosary.js` holds `SEQ` (the whole Rosary, bead by bead), `DRILLS` (which parts are drilled), `MYSTERIES` (the names and days) and the shared Put in order drill and mode switch; `rosary.css` the shared styles
+- `mass/`, `history/` — the other sections; each `index.html` is a landing page marked "Coming soon" until its content is written
+- `shared/cards.js` — the prayer cards and saved progress used by the Prayers and Rosary pages
+- `shared/nav.js` — the menu bar, and the "Questions or suggestions? Send us a note" line it adds at the bottom of every page, linking to the contact form. Load it as the last script on every page (prayer pages rebuild `<body>`, so it must come after `practice.js`); it works out the current section from the page's folder
+- `shared/site.css` — colors and card styles for the home page and the section landing pages
+- `shared/emblems.js` — gold emblems on headers and cards; `beads`, `chalice` and `book` are the Rosary, Mass and History emblems
+- `shared/prayers.js` — the list of prayer pages in Most Common order; the Prayers page cards and each prayer page's header description come from it
+- `game/` — gamified version (in progress; not linked from the site yet)
+- `images/` — Robert Zünd, *The Road to Emmaus* (1877), public domain via Wikimedia Commons; also the site icon (`favicon.svg`, `apple-touch-icon.png`; `favicon.ico` sits at the root)
+- `contact/index.html` — the contact form. Messages are sent through Web3Forms (web3forms.com) to the email address its access key belongs to; hCaptcha and a hidden honeypot field block robots. The key is the `access_key` field in the form
+- `404.html` — the page shown for any missing address
+- `vercel.json` — redirects on the live site (`/rosary/` → the Rosary Prayers page)
+
+To add a section page that uses the practice exercises (e.g. a set of Rosary mysteries or a part of the Mass), copy a prayer page into that section's folder, keep its `<script>` paths pointing at `../prayers/practice.js` and `../shared/`, change its `window.PRAYER` data (with a new `key`), and add a card for it on the section's `index.html`.
+
+To add a prayer, copy one of the pages in `prayers/`, change its `window.PRAYER` data (give it a new `key`), and add it to `shared/prayers.js` with a `priority` and a short `why` (and a `rosary` entry if it's said in the Rosary) (the Prayers page can sort by Most Common or A–Z).
 
 ## Exercises and review
 

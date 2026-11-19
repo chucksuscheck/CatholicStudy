@@ -7,6 +7,7 @@
   --ok:#2E7D4F; --ok-soft:#E1F1E7; --miss:#A8382A; --miss-soft:#F6E1DA;
   --serif:"Spectral",Georgia,"Times New Roman",serif;
   --sans:"Alegreya Sans",-apple-system,"Segoe UI",sans-serif;
+  --wrap:620px;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#12150C; --card:#1B1F13; --ink:#ECE6D2; --muted:#A8A487; --line:#30351F;
@@ -58,11 +59,11 @@ a.hero:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 .path .fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold-bright));border-radius:3px;transition:width .5s}
 @media (prefers-reduced-motion:reduce){.path .fill{transition:none}}
 
-nav{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
-nav button{position:relative;font:500 13px/1.2 var(--sans);border:0;background:transparent;color:var(--muted);padding:9px 2px;border-radius:9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
-nav button b{font:600 15px var(--serif);color:inherit}
-nav button[aria-selected="true"]{background:var(--accent);color:var(--card)}
-nav button[data-done="true"]::after{content:"✓";position:absolute;top:3px;right:5px;font:700 11px var(--sans);color:var(--card);background:var(--gold);
+#tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px}
+#tabs button{position:relative;font:500 13px/1.2 var(--sans);border:0;background:transparent;color:var(--muted);padding:9px 2px;border-radius:9px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px}
+#tabs button b{font:600 15px var(--serif);color:inherit}
+#tabs button[aria-selected="true"]{background:var(--accent);color:var(--card)}
+#tabs button[data-done="true"]::after{content:"✓";position:absolute;top:3px;right:5px;font:700 11px var(--sans);color:var(--card);background:var(--gold);
   width:16px;height:16px;border-radius:50%;display:grid;place-items:center}
 button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 

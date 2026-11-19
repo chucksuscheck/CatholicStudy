@@ -29,12 +29,12 @@ const store={get(k,d){try{const v=localStorage.getItem(P.key+"-"+k);return v==nu
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
 document.title=P.title+" · Faith by Heart";
-// Header line: the same description as this prayer's home page card (Most Common view), from shared/prayers.js.
+// Header line: the same description as this prayer's card on the Prayers page (Most Common view), from shared/prayers.js.
 const CARD=(window.PRAYERS||[]).find(p=>p.key===P.key);
 const DESC=CARD&&window.prayerNote?window.prayerNote(CARD,CARD.why):"";
 document.body.innerHTML=`<div class="wrap">
-  <a class="home" href="../index.html">← All prayers</a>
-  <header><a class="hero" href="../index.html" title="Back to all prayers">
+  <a class="home" href="index.html">← All prayers</a>
+  <header><a class="hero" href="index.html" title="Back to all prayers">
     <div style="position:relative;z-index:1;min-width:0">
       <span class="eyebrow">${P.eyebrow} · Memory practice</span>
       <h1>${P.title}</h1>
@@ -333,7 +333,7 @@ function drawNext(m){
     document.getElementById("nextstep").onclick=()=>{go(STEPS[k+1]);scrollToEl(document.getElementById("tabs"));};
     return;
   }
-  el.innerHTML=`<a class="btn primary" href="../index.html">Next: All prayers →</a>`;
+  el.innerHTML=`<a class="btn primary" href="index.html">Next: All prayers →</a>`;
 }
 function go(m){mode=m;store.set("mode",m);onKey=null;nextAction=null;
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.m===m));

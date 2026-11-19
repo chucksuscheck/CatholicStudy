@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Common Prayers · Faith by Heart</title>
+<meta name="description" content="Memorize the common Catholic prayers in a few minutes a day.">
+<meta name="application-name" content="Faith by Heart">
+<meta name="apple-mobile-web-app-title" content="Faith by Heart">
+<meta property="og:site_name" content="Faith by Heart">
+<meta property="og:title" content="Common Prayers · Faith by Heart">
+<meta property="og:description" content="Memorize the common Catholic prayers in a few minutes a day.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#3F5A26">
+<link rel="icon" href="../images/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../favicon.ico" sizes="48x48">
+<link rel="apple-touch-icon" href="../images/apple-touch-icon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Alegreya+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../shared/site.css">
+<style>
+/* Prayers section: the review list and every prayer, sortable. */
+.sort{order:1;display:flex;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.sort button{font:600 13px var(--sans);border:0;background:transparent;color:var(--muted);padding:10px 12px;border-radius:7px;cursor:pointer}
+.sort button[aria-pressed="true"]{background:var(--accent);color:var(--card)}
+.sort button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+/* Review: every prayer you've finished all five steps for, lowest best recital first */
+.review-list{display:flex;flex-direction:column;gap:8px}
+a.review-item{display:flex;align-items:center;flex-wrap:wrap;gap:4px 14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:12px 14px;color:var(--ink);text-decoration:none}
+a.review-item:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+a.review-item .t{flex:1;min-width:150px;font:500 18px/1.3 var(--serif)}
+a.review-item .s{font-size:13.5px;color:var(--muted)}
+a.review-item .go{font:600 14px var(--sans);color:var(--accent)}
+@media (hover:hover){a.review-item:hover{border-color:var(--gold)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page-h">
+    <div>
+      <span class="eyebrow">Orationes · Memory practice</span>
+      <h1>Common Prayers</h1>
+      <p>The prayers every Catholic knows by heart, in the order you’ll use them most.</p>
+    </div>
+    <svg viewBox="-50 -50 100 100" aria-hidden="true" data-emblem="paternoster"></svg>
+  </header>
+
+  <p class="aloud"><strong>Tip:</strong> say the prayers aloud as you practice. Hearing yourself speak the words helps fix them in memory.</p>
+
+  <section id="reviewsec"></section>
+
+  <section>
+    <div class="sec-h"><h2>Prayers</h2>
+      <div class="sort" role="group" aria-label="Sort prayers">
+        <button type="button" data-sort="priority">Most Common</button><button type="button" data-sort="alpha">A–Z</button>
+      </div>
+    </div>
+    <p class="note" id="sortnote">Ranked by how often you’ll use them.</p>
+    <div class="list" id="prayers"></div>
+  </section>
+
+  <footer><span>Progress is saved in your browser on this device.</span><span>✦ Ora pro nobis</span></footer>
+</div>
+<script src="../shared/emblems.js"></script>
+<script src="../shared/prayers.js"></script>
+<script src="../shared/cards.js"></script>
+<script>
+const PRAYERS=window.PRAYERS; // shared/prayers.js; each href is relative to the site root
+const url=p=>"../"+p.href;
+const list=document.getElementById("prayers");
+const store={raw(k){try{return localStorage.getItem(k)}catch(e){return null}},   // unparsed strings ("home-sort")
+             setRaw(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const esc=window.esc, prog=window.prayerProgress;   // shared/cards.js
+// priority = how often you’ll use them; alpha ignores a leading "The".
+const SORTS={priority:(a,b)=>a.priority-b.priority,
+             alpha:(a,b)=>a.title.replace(/^The /,"").localeCompare(b.title.replace(/^The /,""))};
+let sort=store.raw("home-sort")||"priority";   // key kept from when this list was the home page, so the saved choice carries over
+if(!SORTS[sort])sort="priority";
+const card=p=>window.prayerCard(p,{href:url(p),desc:window.prayerNote(p,sort==="priority"?p.why:p.d),
+  rank:sort==="priority"?p.priority:null,rankLabel:`Most common: number ${p.priority}`});
+// Review: prayers with all five steps done, lowest best recital first, each opening straight to Recite.
+function renderReview(){
+  const sec=document.getElementById("reviewsec");
+  const learned=PRAYERS.filter(p=>prog(p).learned)
+    .sort((a,b)=>(prog(a).best??0)-(prog(b).best??0)||a.priority-b.priority);
+  sec.innerHTML=`<div class="sec-h"><h2>Review</h2></div>${learned.length?`<div class="review-list">${learned.map(p=>`<a class="review-item" href="${url(p)}#recite">
+      <span class="t">${esc(p.title)}</span>${prog(p).best!=null?`<span class="s">Best recital ${prog(p).best}%</span>`:""}<span class="go">Recite →</span></a>`).join("")}</div>`
+    :`<p class="quiet">Prayers appear here once you finish all five steps, so you can come back and recite them.</p>`}`;
+}
+function render(){
+  list.replaceChildren(...[...PRAYERS].sort(SORTS[sort]).map(card));
+  document.querySelectorAll(".sort button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.sort===sort));
+  document.getElementById("sortnote").hidden=sort!=="priority";
+}
+document.querySelectorAll(".sort button").forEach(b=>b.onclick=()=>{
+  sort=b.dataset.sort;store.setRaw("home-sort",sort);render();});
+document.querySelectorAll("svg[data-emblem]").forEach(s=>window.drawEmblem(s,s.dataset.emblem));
+renderReview();
+render();
+</script>
+<script src="../shared/nav.js"></script>
+</body>
+</html>
