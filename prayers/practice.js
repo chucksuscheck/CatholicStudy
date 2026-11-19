@@ -28,7 +28,7 @@ const store={get(k,d){try{const v=localStorage.getItem(P.key+"-"+k);return v==nu
              set(k,v){try{localStorage.setItem(P.key+"-"+k,JSON.stringify(v))}catch(e){}}};
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 
-document.title=P.title;
+document.title=P.title+" · Faith by Heart";
 // Header line: the same description as this prayer's home page card (Most Common view), from shared/prayers.js.
 const CARD=(window.PRAYERS||[]).find(p=>p.key===P.key);
 const DESC=CARD&&window.prayerNote?window.prayerNote(CARD,CARD.why):"";
