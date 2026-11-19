@@ -1,4 +1,4 @@
-# Catholic Prayer Study
+# Faith by Heart
 
 A small static site for studying Catholic concepts and memorizing prayers.
 
@@ -45,4 +45,4 @@ Open `index.html` in a browser, or serve the folder:
 python3 -m http.server
 ```
 
-The site is deployed on Vercel (https://catholicstudy.vercel.app) from the `main` branch.
+The site is live at https://faithbyheart.org (also https://faithbyheart.com), deployed on Vercel from the `main` branch.
