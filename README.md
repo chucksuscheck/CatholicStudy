@@ -11,9 +11,9 @@ The site has four sections, reached from the menu bar at the top of every page: 
 - `rosary/` — the Rosary section: three pages with a Prayers · Mechanics · Mysteries tab row under the banner. There's no `index.html`; the menu opens `prayers.html`, and `vercel.json` redirects `/rosary/` there:
   - `prayers.html` — the six prayers of the Rosary in the order they first come (cards link to the practice pages in `prayers/`)
   - `mechanics.html` — the whole Rosary in order, with a Put in order drill for the Opening, Each decade and the Closing (tap the prayer that comes next; shown first) and a Study view showing the same cards filled in
-  - `mysteries.html` — the four sets of mysteries, with a Put in order drill for each set (shown first) and a Study view showing them filled in
+  - `mysteries.html` — the four sets of mysteries, with a Put in order drill for each set (shown first) and a Study view showing them filled in, after Mysteries by day (match each day of the week to its set; the list includes made-up decoy sets)
   - Which prayers belong to the Rosary, their learning order and when each is said come from the `rosary` entry on each prayer in `shared/prayers.js`; to add or change a Rosary prayer, edit it there
-  - `rosary.js` holds `SEQ` (the whole Rosary, bead by bead), `DRILLS` (which parts are drilled), `MYSTERIES` (the names and days) and the shared Put in order drill and mode switch; `rosary.css` the shared styles
+  - `rosary.js` holds `SEQ` (the whole Rosary, bead by bead), `DRILLS` (which parts are drilled), `MYSTERIES` (the names and days), `DAYS`, `DECOYS` (made-up sets for the day matching) and the shared Put in order drill and mode switch; `rosary.css` the shared styles
 - `mass/`, `history/` — the other sections; each `index.html` is a landing page marked "Coming soon" until its content is written
 - `shared/cards.js` — the prayer cards and saved progress used by the Prayers and Rosary pages
 - `shared/nav.js` — the menu bar, and the "Questions or suggestions? Send us a note" line it adds at the bottom of every page, linking to the contact form. Load it as the last script on every page (prayer pages rebuild `<body>`, so it must come after `practice.js`); it works out the current section from the page's folder

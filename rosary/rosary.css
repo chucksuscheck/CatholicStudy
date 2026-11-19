@@ -42,3 +42,20 @@
 .feedback.done{color:var(--accent);font-weight:600}
 .again{font:600 14px var(--sans);color:var(--card);background:var(--accent);border:0;border-radius:999px;padding:10px 18px;min-height:44px;cursor:pointer;margin-top:10px}
 .again:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* Mysteries page: Mysteries by day. One row per day, each with a dropdown of mystery sets (real ones plus decoys). */
+.match{list-style:none;margin:0 0 14px;padding:0;display:flex;flex-direction:column;gap:6px}
+.match li{display:grid;grid-template-columns:110px 1fr 22px;align-items:center;gap:10px;padding:6px 10px;border-radius:10px;border:1px solid transparent}
+.match .day{font:500 17px var(--serif);color:var(--ink)}
+.match select{font:15px var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;min-height:42px;width:100%}
+.match select:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.match .mark{font:700 16px var(--sans);text-align:center}
+.match li.right{background:var(--accent-soft)}
+.match li.right .mark{color:var(--accent)}
+.match li.wrong{background:#F6E1DA;border-color:#A8382A}
+.match li.wrong .mark{color:#A8382A}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .match li.wrong{background:#3A1E18;border-color:#EE917E}
+  :root:not([data-theme="light"]) .match li.wrong .mark{color:#EE917E}}
+@media (max-width:420px){.match li{grid-template-columns:1fr 22px}.match .day{grid-column:1 / -1}}
+.check{font:600 14px var(--sans);color:var(--card);background:var(--accent);border:0;border-radius:999px;padding:10px 18px;min-height:44px;cursor:pointer}
+.check:focus-visible{outline:2px solid var(--gold);outline-offset:2px}

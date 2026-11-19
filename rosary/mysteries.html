@@ -31,7 +31,13 @@
   </header>
   <nav class="subnav" aria-label="Rosary"><a href="prayers.html">Prayers</a><a href="mechanics.html">Mechanics</a><a href="mysteries.html" aria-current="page">Mysteries</a></nav>
 
-  <p class="aloud"><strong>How they’re used:</strong> each decade of the Rosary is prayed while thinking about one mystery, so one set of five fills a whole Rosary. Each set is traditionally prayed on certain days of the week.</p>
+  <p class="aloud"><strong>How they’re used:</strong> each decade of the Rosary is prayed while thinking about one mystery, so one set of five fills a whole Rosary. Each set is traditionally prayed on certain days of the week; match them up in <a href="#days-sec">Mysteries by day</a>.</p>
+
+  <section id="days-sec">
+    <div class="sec-h"><h2>Mysteries by day</h2></div>
+    <p class="note">Each day of the week has its own set of mysteries. Choose the set for each day, then check. Not every set in the list is part of the Rosary.</p>
+    <div class="drill" id="days"></div>
+  </section>
 
   <section>
     <div class="sec-h"><h2>The mysteries</h2>
@@ -44,7 +50,7 @@
       <div class="drills" id="drills"></div>
     </div>
     <div id="study" hidden>
-      <p class="note">The four sets, in the order of Christ’s life, with the days each is prayed.</p>
+      <p class="note">The four sets, in the order of Christ’s life.</p>
       <div class="drills" id="sets"></div>
     </div>
   </section>
@@ -63,6 +69,53 @@ const {MYSTERIES}=window.ROSARY;
 window.ROSARY.modes();
 document.getElementById("drills").replaceChildren(...MYSTERIES.map(m=>window.ROSARY.orderDrill(m,"rosary-mysteries","mystery")));
 document.getElementById("sets").innerHTML=window.ROSARY.studyCards(MYSTERIES);
+
+// ---- Mysteries by day: pick the set for each day. Choices are the four sets plus decoys, shuffled.
+// Saved: rosary-days = true once every day is right on the first check.
+(function(){
+  const {MYSTERIES,DAYS,DECOYS}=window.ROSARY;
+  const answer=d=>MYSTERIES.find(m=>m.days.includes(d)).title;
+  const shuffle=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;};
+  const box=document.getElementById("days");
+  let checks;
+  function start(){
+    checks=0;
+    const sets=shuffle([...MYSTERIES.map(m=>m.title),...DECOYS]);
+    box.innerHTML=`<div class="drill-h"><h3>Which mysteries on which day?</h3><span class="status">${store.get("rosary-days",false)?"✦ Known":""}</span></div>
+      <ol class="match">${DAYS.map((d,i)=>`<li data-day="${d}"><label class="day" for="day${i}">${d}</label>
+        <select id="day${i}"><option value="">Choose…</option>${sets.map(t=>`<option>${esc(t)}</option>`).join("")}</select>
+        <span class="mark" aria-hidden="true"></span></li>`).join("")}</ol>
+      <button type="button" class="check">Check</button>
+      <p class="feedback" aria-live="polite"></p>`;
+    box.querySelectorAll(".match select").forEach(sel=>sel.onchange=()=>{const li=sel.closest("li");li.className="";li.querySelector(".mark").textContent="";});
+    box.querySelector(".check").onclick=check;
+  }
+  function check(){
+    const rows=[...box.querySelectorAll(".match li")], fb=box.querySelector(".feedback");
+    if(rows.some(li=>!li.querySelector("select").value)){fb.className="feedback";fb.textContent="Choose a set for every day first.";return;}
+    checks++;
+    let right=0;
+    rows.forEach(li=>{
+      const ok=li.querySelector("select").value===answer(li.dataset.day);
+      li.className=ok?"right":"wrong";li.querySelector(".mark").textContent=ok?"✓":"✗";
+      li.querySelector("select").setAttribute("aria-invalid",String(!ok));
+      if(ok)right++;
+    });
+    if(right===DAYS.length){
+      const first=checks===1;
+      if(first){store.set("rosary-days",true);box.querySelector(".status").textContent="✦ Known";}
+      fb.className="feedback done";
+      fb.textContent=first?"All seven days right on the first try. ✦":"All seven days right. Try it again until it’s right the first time.";
+      const again=document.createElement("button");again.type="button";again.className="again";again.textContent="Again, shuffled";
+      again.onclick=()=>{start();box.querySelector("select").focus();};
+      box.querySelector(".check").replaceWith(again);
+    }else{
+      fb.className="feedback";
+      fb.textContent=`${right} of ${DAYS.length} right. Change the red ones and check again.`;
+    }
+  }
+  start();
+})();
 </script>
 <script src="../shared/nav.js"></script>
 </body>

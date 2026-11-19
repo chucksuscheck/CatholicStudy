@@ -31,17 +31,22 @@ window.ROSARY=(function(){
   ];
   const DRILLS=["opening","decade","closing"];   // parts drilled on the Mechanics page, in order
 
-  // The mysteries, in the order of Christ's life, each with the days it's traditionally prayed.
+  // The mysteries, in the order of Christ's life. days: when each set is traditionally prayed (drilled in Mysteries
+  // by day on the Mysteries page; not shown on the set headings).
   const MYSTERIES=[
-    {id:"joyful",title:"The Joyful Mysteries",note:"Monday and Saturday",items:[
+    {id:"joyful",title:"The Joyful Mysteries",days:["Monday","Saturday"],items:[
       "The Annunciation","The Visitation","The Nativity","The Presentation in the Temple","The Finding in the Temple"]},
-    {id:"luminous",title:"The Luminous Mysteries",note:"Thursday",items:[
+    {id:"luminous",title:"The Luminous Mysteries",days:["Thursday"],items:[
       "The Baptism of the Lord","The Wedding at Cana","The Proclamation of the Kingdom","The Transfiguration","The Institution of the Eucharist"]},
-    {id:"sorrowful",title:"The Sorrowful Mysteries",note:"Tuesday and Friday",items:[
+    {id:"sorrowful",title:"The Sorrowful Mysteries",days:["Tuesday","Friday"],items:[
       "The Agony in the Garden","The Scourging at the Pillar","The Crowning with Thorns","The Carrying of the Cross","The Crucifixion"]},
-    {id:"glorious",title:"The Glorious Mysteries",note:"Wednesday and Sunday",items:[
+    {id:"glorious",title:"The Glorious Mysteries",days:["Wednesday","Sunday"],items:[
       "The Resurrection","The Ascension","The Descent of the Holy Spirit","The Assumption","The Coronation of Mary"]}
   ];
+
+  const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  // Made-up sets that are NOT part of the Rosary: decoys in the Mysteries by day matching.
+  const DECOYS=["The Hopeful Mysteries","The Healing Mysteries","The Faithful Mysteries"];
 
   const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
                set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -115,5 +120,5 @@ window.ROSARY=(function(){
   // A Mechanics step's name, as shown in the drills and the Study view ("Hail Mary ×3").
   const stepLabel=s=>(s.key?BY[s.key].title:s.name)+(s.times?` ×${s.times}`:"");
 
-  return {BY,url,LEARN,SEQ,SIGN,DRILLS,MYSTERIES,store,prayersLearned,known,modes,orderDrill,studyCards,stepLabel};
+  return {BY,url,LEARN,SEQ,SIGN,DRILLS,MYSTERIES,DAYS,DECOYS,store,prayersLearned,known,modes,orderDrill,studyCards,stepLabel};
 })();
